@@ -38,6 +38,12 @@ class StockIn(BaseModel):
 class ConnectIn(BaseModel):
     url: str = Field(min_length=8, max_length=500)
 
+class OwnerTelegramRequest(BaseModel):
+    owner_username: str
+
+STORE_SETTINGS = {
+    "owner_username": "yojityadav"
+}
 
 def _view(p):
     s = p["stock"]
@@ -78,7 +84,10 @@ def resolve(qid: int):
 @app.get("/api/chats")
 def chats():
     return db.list_chats()
-
+@app.post("/api/store/owner-telegram")
+def update_owner_telegram(req: OwnerTelegramRequest):
+    STORE_SETTINGS["owner_username"] = req.owner_username.replace("@", "")
+    return {"ok": True, "owner_username": STORE_SETTINGS["owner_username"]}
 @app.post("/api/store/connect")
 def connect(body: ConnectIn):
     try:
@@ -87,14 +96,38 @@ def connect(body: ConnectIn):
         raise HTTPException(422, str(e))
 
 @app.post("/api/telegram/webhook")
-def telegram_webhook(update: dict = Body(...),
-                     x_telegram_bot_api_secret_token: str = Header(default=None)):
+async def telegram_webhook(
+    update: dict = Body(...),
+    x_telegram_bot_api_secret_token: str = Header(default=None),
+):
     secret = os.getenv("TELEGRAM_WEBHOOK_SECRET")
     if secret and x_telegram_bot_api_secret_token != secret:
         raise HTTPException(403, "Bad secret")
+
     msg = update.get("message") or {}
-    text, chat_id = msg.get("text"), (msg.get("chat") or {}).get("id")
+    text = msg.get("text")
+    chat_id = (msg.get("chat") or {}).get("id")
+
     if text and chat_id:
         r = brain.handle_message(text, "telegram")
-        telegram.send_message(chat_id, r["reply"])
+        reply_text = r["reply"]
+
+        if r.get("status") == "needs_owner" or "owner" in str(r.get("status", "")).lower():
+            owner_handle = STORE_SETTINGS.get("owner_username", "yojityadav")
+            payload = {
+                "chat_id": chat_id,
+                "text": reply_text,
+                "reply_markup": {
+                    "inline_keyboard": [
+                        [{"text": "💬 Chat with Store Owner", "url": f"https://t.me/{owner_handle}"}]
+                    ]
+                },
+            }
+            import httpx
+            token = os.getenv("TELEGRAM_BOT_TOKEN")
+            async with httpx.AsyncClient() as client:
+                await client.post(f"https://api.telegram.org/bot{token}/sendMessage", json=payload)
+        else:
+            telegram.send_message(chat_id, reply_text)
+
     return {"ok": True}

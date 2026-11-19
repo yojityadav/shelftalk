@@ -47,7 +47,20 @@ h1{font-family:"Bricolage Grotesque",sans-serif;font-size:2rem;font-weight:800}
       <p class="mut">Customer chats waiting for human review.</p>
     </div>
   </div>
+</div>
 
+<div class="card">
+  <h3>Connect Personal Telegram</h3>
+  <p class="mut">Enter your personal handle so the bot can hand over unhandled inquiries directly to you.</p>
+  <div style="display:flex; gap:0.5rem; margin-top:1rem;">
+    <input type="text" id="ownerTgInput" placeholder="@YourPersonalUsername" style="flex:1; min-height:2.75rem; padding:0 0.75rem; border:2px solid var(--ink); border-radius:6px;">
+    <button type="button" class="btn" id="saveOwnerTgBtn">Save Handle</button>
+  </div>
+  <p id="ownerTgStatus" style="font-size:0.85rem; margin-top:0.55rem; font-weight:600;"></p>
+</div>
+
+<div class="card">
+  <h3>Recent Customer Inquiries & Bot Logs</h3>
   <div class="card">
     <h3>Recent Customer Inquiries & Bot Logs</h3>
     <ul class="log-list" id="logList">
@@ -61,6 +74,33 @@ h1{font-family:"Bricolage Grotesque",sans-serif;font-size:2rem;font-weight:800}
 const store=JSON.parse(localStorage.getItem('shelftalk_store')||'{"bot":"@ShelfTalkBot"}');
 if(store.bot) document.getElementById('botHandle').textContent = store.bot;
 if(store.productsCount) document.getElementById('prodCount').textContent = store.productsCount;
+</script>
+<script>
+  document.getElementById('saveOwnerTgBtn').addEventListener('click', async () => {
+    const rawInput = document.getElementById('ownerTgInput').value.trim();
+    const username = rawInput.replace('@', '');
+    const status = document.getElementById('ownerTgStatus');
+
+    if (!username) {
+      status.style.color = 'var(--bad, #e11d48)';
+      status.textContent = 'Please enter a valid Telegram username.';
+      return;
+    }
+
+    try {
+      const res = await fetch('https://shelftalk-9df0.onrender.com/api/store/owner-telegram', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ owner_username: username })
+      });
+      if (!res.ok) throw new Error('Failed to update owner username');
+      status.style.color = 'var(--acc, #16a34a)';
+      status.textContent = `Saved! Inquiries requiring escalation will link to @${username}.`;
+    } catch (err) {
+      status.style.color = 'var(--bad, #e11d48)';
+      status.textContent = err.message;
+    }
+  });
 </script>
 </body>
 </html>
