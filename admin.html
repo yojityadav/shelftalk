@@ -13,7 +13,7 @@ body{background:var(--paper);color:var(--ink);font:400 1rem/1.5 system-ui,sans-s
 header{display:flex;justify-content:space-between;align-items:center;margin-bottom:2.5rem;border-bottom:2px solid var(--ink);padding-bottom:1rem}
 h1{font-family:"Bricolage Grotesque",sans-serif;font-size:2rem;font-weight:800}
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.5rem;margin-bottom:2rem}
-.card{background:var(--card);border:2px solid var(--ink);border-radius:10px;padding:1.5rem;box-shadow:4px 4px 0 var(--ink)}
+.card{background:var(--card);border:2px solid var(--ink);border-radius:10px;padding:1.5rem;box-shadow:4px 4px 0 var(--ink);margin-bottom:1.5rem}
 .card h3{font-family:"Bricolage Grotesque",sans-serif;font-size:1.25rem;margin-bottom:.75rem}
 .stat{font-size:2.25rem;font-weight:800;font-family:"Bricolage Grotesque",sans-serif;color:var(--acc);margin-bottom:.5rem}
 .btn{display:inline-flex;align-items:center;justify-content:center;min-height:2.75rem;padding:0 1.25rem;border:2px solid var(--ink);border-radius:6px;background:var(--acc);color:var(--on);font-weight:600;cursor:pointer;text-decoration:none}
@@ -47,20 +47,17 @@ h1{font-family:"Bricolage Grotesque",sans-serif;font-size:2rem;font-weight:800}
       <p class="mut">Customer chats waiting for human review.</p>
     </div>
   </div>
-</div>
 
-<div class="card">
-  <h3>Connect Personal Telegram</h3>
-  <p class="mut">Enter your personal handle so the bot can hand over unhandled inquiries directly to you.</p>
-  <div style="display:flex; gap:0.5rem; margin-top:1rem;">
-    <input type="text" id="ownerTgInput" placeholder="@YourPersonalUsername" style="flex:1; min-height:2.75rem; padding:0 0.75rem; border:2px solid var(--ink); border-radius:6px;">
-    <button type="button" class="btn" id="saveOwnerTgBtn">Save Handle</button>
+  <div class="card">
+    <h3>Connect Personal Telegram</h3>
+    <p class="mut">Enter your personal handle so the bot can hand over unhandled inquiries directly to you.</p>
+    <div style="display:flex; gap:0.5rem; margin-top:1rem;">
+      <input type="text" id="ownerTgInput" placeholder="@YourPersonalUsername" style="flex:1; min-height:2.75rem; padding:0 0.75rem; border:2px solid var(--ink); border-radius:6px;">
+      <button type="button" class="btn" id="saveOwnerTgBtn">Save Handle</button>
+    </div>
+    <p id="ownerTgStatus" style="font-size:0.85rem; margin-top:0.55rem; font-weight:600;"></p>
   </div>
-  <p id="ownerTgStatus" style="font-size:0.85rem; margin-top:0.55rem; font-weight:600;"></p>
-</div>
 
-<div class="card">
-  <h3>Recent Customer Inquiries & Bot Logs</h3>
   <div class="card">
     <h3>Recent Customer Inquiries & Bot Logs</h3>
     <ul class="log-list" id="logList">
@@ -71,10 +68,10 @@ h1{font-family:"Bricolage Grotesque",sans-serif;font-size:2rem;font-weight:800}
 </div>
 
 <script>
-const store=JSON.parse(localStorage.getItem('shelftalk_store')||'{"bot":"@ShelfTalkBot"}');
-if(store.bot) document.getElementById('botHandle').textContent = store.bot;
-if(store.productsCount) document.getElementById('prodCount').textContent = store.productsCount;
-</script>
+const store = JSON.parse(localStorage.getItem('shelftalk_store') || '{"bot":"@ShelfTalkBot"}');
+if (store.bot) document.getElementById('botHandle').textContent = store.bot;
+if (store.productsCount) document.getElementById('prodCount').textContent = store.productsCount;
+
 document.getElementById('saveOwnerTgBtn').addEventListener('click', async () => {
   const rawInput = document.getElementById('ownerTgInput').value.trim();
   const username = rawInput.replace('@', '');
@@ -86,7 +83,9 @@ document.getElementById('saveOwnerTgBtn').addEventListener('click', async () => 
     return;
   }
 
-  // Grabs ?api= parameter from URL or defaults to your live Render backend
+  status.style.color = '#555';
+  status.textContent = 'Connecting to server...';
+
   const urlParams = new URLSearchParams(window.location.search);
   const apiBase = urlParams.get('api') || 'https://shelftalk-9df9.onrender.com';
 
@@ -97,11 +96,13 @@ document.getElementById('saveOwnerTgBtn').addEventListener('click', async () => 
       body: JSON.stringify({ owner_username: username })
     });
     if (!res.ok) throw new Error('Failed to update owner username');
+    
+    const data = await res.json();
     status.style.color = 'var(--acc, #16a34a)';
-    status.textContent = `Saved! Inquiries requiring escalation will link to @${username}.`;
+    status.textContent = `Saved! Direct chats will now link to @${data.owner_username}.`;
   } catch (err) {
     status.style.color = 'var(--bad, #e11d48)';
-    status.textContent = err.message;
+    status.textContent = 'Error: ' + err.message;
   }
 });
 </script>
