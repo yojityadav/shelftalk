@@ -8,6 +8,7 @@ try:
 except ImportError:
     pass
 
+import httpx
 from fastapi import Body, FastAPI, Header, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
@@ -44,6 +45,7 @@ class OwnerTelegramRequest(BaseModel):
 STORE_SETTINGS = {
     "owner_username": "yojityadav"
 }
+CUSTOMER_STORE_SESSIONS = {}
 
 def _view(p):
     s = p["stock"]
@@ -84,10 +86,13 @@ def resolve(qid: int):
 @app.get("/api/chats")
 def chats():
     return db.list_chats()
+
 @app.post("/api/store/owner-telegram")
 def update_owner_telegram(req: OwnerTelegramRequest):
-    STORE_SETTINGS["owner_username"] = req.owner_username.replace("@", "")
-    return {"ok": True, "owner_username": STORE_SETTINGS["owner_username"]}
+    clean_name = req.owner_username.replace("@", "").strip()
+    STORE_SETTINGS["owner_username"] = clean_name
+    return {"ok": True, "owner_username": clean_name}
+
 @app.post("/api/store/connect")
 def connect(body: ConnectIn):
     try:
@@ -105,29 +110,50 @@ async def telegram_webhook(
         raise HTTPException(403, "Bad secret")
 
     msg = update.get("message") or {}
-    text = msg.get("text")
+    text = (msg.get("text") or "").strip()
     chat_id = (msg.get("chat") or {}).get("id")
 
-    if text and chat_id:
-        r = brain.handle_message(text, "telegram")
-        reply_text = r["reply"]
+    if not chat_id or not text:
+        return {"ok": True}
 
-        if r.get("status") == "needs_owner" or "owner" in str(r.get("status", "")).lower():
-            owner_handle = STORE_SETTINGS.get("owner_username", "yojityadav")
-            payload = {
-                "chat_id": chat_id,
-                "text": reply_text,
-                "reply_markup": {
-                    "inline_keyboard": [
-                        [{"text": "💬 Chat with Store Owner", "url": f"https://t.me/{owner_handle}"}]
-                    ]
-                },
-            }
-            import httpx
-            token = os.getenv("TELEGRAM_BOT_TOKEN")
-            async with httpx.AsyncClient() as client:
-                await client.post(f"https://api.telegram.org/bot{token}/sendMessage", json=payload)
-        else:
-            telegram.send_message(chat_id, reply_text)
+    token = os.getenv("TELEGRAM_BOT_TOKEN")
+
+    # Parse /start store_<handle> deep links
+    if text.startswith("/start"):
+        parts = text.split()
+        if len(parts) > 1 and parts[1].startswith("store_"):
+            store_handle = parts[1].replace("store_", "").strip()
+            CUSTOMER_STORE_SESSIONS[chat_id] = store_handle
+            STORE_SETTINGS["owner_username"] = store_handle
+
+        active_owner = CUSTOMER_STORE_SESSIONS.get(chat_id, STORE_SETTINGS.get("owner_username", "yojityadav"))
+        welcome_text = f"Welcome! Connected to store assistant (Escalations route to @{active_owner}). How can I help you today?"
+        
+        async with httpx.AsyncClient() as client:
+            await client.post(
+                f"https://api.telegram.org/bot{token}/sendMessage",
+                json={"chat_id": chat_id, "text": welcome_text}
+            )
+        return {"ok": True}
+
+    # Handle customer messages & escalations
+    r = brain.handle_message(text, "telegram")
+    reply_text = r["reply"]
+
+    if r.get("status") == "needs_owner" or "owner" in str(r.get("status", "")).lower():
+        owner_handle = CUSTOMER_STORE_SESSIONS.get(chat_id, STORE_SETTINGS.get("owner_username", "yojityadav"))
+        payload = {
+            "chat_id": chat_id,
+            "text": reply_text,
+            "reply_markup": {
+                "inline_keyboard": [
+                    [{"text": f"💬 Chat with Store Owner (@{owner_handle})", "url": f"https://t.me/{owner_handle}"}]
+                ]
+            },
+        }
+        async with httpx.AsyncClient() as client:
+            await client.post(f"https://api.telegram.org/bot{token}/sendMessage", json=payload)
+    else:
+        telegram.send_message(chat_id, reply_text)
 
     return {"ok": True}
