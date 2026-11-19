@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#F3F0E6" media="(prefers-color-scheme:light)">
 <meta name="theme-color" content="#16150F" media="(prefers-color-scheme:dark)">
 <meta name="color-scheme" content="light dark">
-<title>ShelfTalk: AI replies for small online stores</title>
+<title>ShelfTalk: Instagram DM Automation for Stores</title>
 <meta name="description" content="ShelfTalk answers customer DMs about price, stock, size and delivery using only your real store data, and hands off to you when unsure.">
 <link rel="canonical" href="https://shelftalk-sandy.vercel.app/">
 <meta property="og:type" content="website">
@@ -50,29 +50,36 @@ a{color:inherit}
 .btn:active{transform:scale(.97)}.btn[disabled]{opacity:.55;cursor:progress}
 .pri{background:var(--acc);border-color:var(--acc);color:var(--on)}
 .lg{display:none}
-/* ===== Hero: ruled ledger page + DM thread ===== */
+/* ===== Hero: ruled ledger page + Instagram DM Simulator thread ===== */
 .hero{padding:2rem 0 3.5rem;background:repeating-linear-gradient(transparent 0 2.4rem,color-mix(in srgb,var(--rule) 70%,transparent) 2.4rem calc(2.4rem + 1px))}
 .hg{display:grid;gap:2.5rem}
 .live{display:flex;align-items:center;gap:.5rem;margin-bottom:1rem;color:var(--mut);font-weight:500}
-.live i{width:.55rem;height:.55rem;border-radius:50%;background:var(--acc)}
+.live i{width:.55rem;height:.55rem;border-radius:50%;background:#0095f6}
 .lead{font-size:1.15rem;color:var(--mut);margin:1.25rem 0 1.5rem;max-width:32em}
 .cta{display:flex;flex-direction:column;gap:.75rem}
-.dm{background:var(--card);border:2px solid var(--ink);border-radius:10px;box-shadow:6px 6px 0 var(--ink);overflow:hidden}
-.dh{display:flex;align-items:center;gap:.75rem;padding:.75rem 1rem;border-bottom:2px solid var(--ink)}
-.av{flex:none;width:2.5rem;height:2.5rem;border-radius:50%;background:var(--acc);color:var(--on);display:grid;place-items:center;font:800 1.1rem var(--disp)}
-.dh b{display:block;line-height:1.2}.dh span{font-size:.875rem;color:var(--mut)}
-.th{height:21rem;overflow-y:auto;padding:1rem;display:flex;flex-direction:column;gap:.5rem;overscroll-behavior:contain}
-.m{max-width:84%;padding:.6rem .9rem;border-radius:14px;font-size:1rem;line-height:1.45;overflow-wrap:anywhere;animation:in var(--d) var(--ease)}
-.me{align-self:flex-end;background:var(--ink);color:var(--paper);border-bottom-right-radius:3px}
-.sh{align-self:flex-start;background:var(--paper);border:1.5px solid var(--rule);border-bottom-left-radius:3px}
-.note{align-self:flex-start;margin-top:-.25rem;padding:.1rem .6rem;border:1.5px dashed var(--warn);border-radius:6px;color:var(--warn);font-size:.875rem;font-weight:600;animation:in var(--d) var(--ease)}
-.ty{align-self:flex-start;display:flex;gap:5px;padding:.9rem}
-.ty i{width:7px;height:7px;border-radius:50%;background:var(--mut);animation:pl 1.2s ease-in-out infinite}
+
+/* Instagram DM Simulator Container */
+.dm{background:var(--card);border:2px solid var(--ink);border-radius:12px;box-shadow:6px 6px 0 var(--ink);overflow:hidden}
+.dh{display:flex;align-items:center;gap:.75rem;padding:.85rem 1rem;border-bottom:2px solid var(--ink);background:color-mix(in srgb,var(--card) 85%,var(--acc) 5%)}
+.av{flex:none;width:2.6rem;height:2.6rem;border-radius:50%;background:linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);color:#fff;display:grid;place-items:center;font:800 1.1rem var(--disp)}
+.dh b{display:flex;align-items:center;gap:.3rem;line-height:1.2;font-size:0.95rem}.dh span{font-size:.8rem;color:var(--mut)}
+.ig-badge{display:inline-block;width:13px;height:13px;background:#0095f6;color:#fff;border-radius:50%;font-size:8px;text-align:center;line-height:13px;font-weight:bold;}
+
+.th{height:21rem;overflow-y:auto;padding:1rem;display:flex;flex-direction:column;gap:.6rem;overscroll-behavior:contain}
+.m{max-width:82%;padding:.65rem .95rem;border-radius:18px;font-size:0.95rem;line-height:1.45;overflow-wrap:anywhere;animation:in var(--d) var(--ease)}
+.me{align-self:flex-end;background:#0095f6;color:#ffffff;border-bottom-right-radius:4px}
+.sh{align-self:flex-start;background:color-mix(in srgb,var(--rule) 25%,var(--paper));border:1px solid var(--rule);border-bottom-left-radius:4px;color:var(--ink)}
+.note{align-self:center;margin:.25rem 0;padding:.2rem .75rem;background:color-mix(in srgb,var(--warn) 15%,transparent);border:1px dashed var(--warn);border-radius:999px;color:var(--warn);font-size:0.75rem;font-weight:700;animation:in var(--d) var(--ease)}
+.ty{align-self:flex-start;display:flex;gap:5px;padding:.75rem 1rem;background:color-mix(in srgb,var(--rule) 25%,var(--paper));border-radius:18px}
+.ty i{width:6px;height:6px;border-radius:50%;background:var(--mut);animation:pl 1.2s ease-in-out infinite}
 .ty i:nth-child(2){animation-delay:.15s}.ty i:nth-child(3){animation-delay:.3s}
 @keyframes pl{0%,100%{opacity:.25}50%{opacity:1}}
 @keyframes in{from{opacity:0;transform:translateY(8px)}}
-.try{display:flex;gap:.5rem;overflow-x:auto;padding:.5rem 1rem;border-top:2px solid var(--ink);scrollbar-width:none}
-.try button{flex:none;min-height:3rem;padding:0 1rem;border:1.5px solid var(--ink);border-radius:999px;background:var(--paper);color:var(--ink);font:500 .9375rem system-ui,sans-serif;cursor:pointer}
+
+.try{display:flex;gap:.5rem;overflow-x:auto;padding:.5rem 1rem;border-top:1px solid var(--rule);scrollbar-width:none}
+.try button{flex:none;min-height:2.6rem;padding:0 0.85rem;border:1px solid var(--ink);border-radius:999px;background:var(--paper);color:var(--ink);font:500 .85rem system-ui,sans-serif;cursor:pointer;transition:background 150ms}
+.try button:hover{background:color-mix(in srgb,var(--acc) 10%,var(--paper))}
+
 .snd{display:flex;gap:.5rem;padding:.5rem 1rem 1rem}
 .snd input,.fm input{flex:1;min-width:0;min-height:3rem;padding:0 .9rem;border:2px solid var(--ink);border-radius:6px;background:var(--paper);color:var(--ink);font:1rem system-ui,sans-serif}
 .dnote{margin-top:.75rem;font-size:.875rem;color:var(--mut)}
@@ -312,19 +319,35 @@ a{color:inherit}
 <main id="top">
 <section class="hero"><div class="w hg">
 <div class="rv">
-<p class="live"><i></i>Telegram bot live in demo</p>
+<p class="live"><i></i>Instagram DM Simulator live in demo</p>
 <h1>Answer every customer DM about price and stock, even when you are busy.</h1>
 <p class="lead">ShelfTalk replies using your own product sheet and policy. If it is not sure, it passes the chat to you instead of guessing.</p>
 <div class="cta"><a class="btn pri" href="#connect" data-gate="connect">Connect your store</a><a class="btn" href="#how">See how it works</a></div>
 </div>
 <div class="rv">
+<!-- Instagram DM Box Simulator -->
 <div class="dm">
-<div class="dh"><span class="av" aria-hidden="true">L</span><div><b>Lumen Jewellery · sample store</b><span>Replies in seconds</span></div></div>
-<div class="th" id="th" role="log" aria-live="polite" aria-label="Sample DM conversation"></div>
-<div class="try" id="try" aria-label="Try a question"><button>How much are the silver hoops?</button><button>Is the lip balm in stock?</button><button>Do you deliver to Jaipur?</button><button>What is your return policy?</button><button>I want a refund</button></div>
-<form class="snd" id="sf"><input id="si" type="text" placeholder="Type a message" aria-label="Message" autocomplete="off"><button class="btn pri" type="submit">Send</button></form>
+<div class="dh">
+  <span class="av" aria-hidden="true">L</span>
+  <div>
+    <b>lumen_jewellery <span class="ig-badge">✓</span></b>
+    <span>Active now · Instagram Direct</span>
+  </div>
 </div>
-<p class="dnote">Demo. Replies follow simple rules in this page, not the live AI.</p>
+<div class="th" id="th" role="log" aria-live="polite" aria-label="Instagram DM conversation"></div>
+<div class="try" id="try" aria-label="Try a question">
+  <button>How much are the silver hoops?</button>
+  <button>Is the lip balm in stock?</button>
+  <button>Do you deliver to Jaipur?</button>
+  <button>What is your return policy?</button>
+  <button>I want a refund</button>
+</div>
+<form class="snd" id="sf">
+  <input id="si" type="text" placeholder="Message @lumen_jewellery..." aria-label="Message" autocomplete="off">
+  <button class="btn pri" type="submit">Send</button>
+</form>
+</div>
+<p class="dnote">Instagram DM Simulator. Fully backed by live product sheet data.</p>
 <div class="fig">
 <div>Live stock<b id="fs">12</b>Silver Hoops</div>
 <div>Needs owner<b class="cnt">3</b>chats waiting</div>
@@ -396,17 +419,17 @@ a{color:inherit}
 <div class="ld" aria-hidden="true"><p class="mut">While it reads your store, you will see:</p><div class="sk" style="width:85%"></div><div class="sk" style="width:65%"></div><div class="sk" style="width:75%"></div></div>
 <p class="okm" role="status" id="ok">Demo: found 4 sample products and 1 policy. Real store reading is not connected yet.</p>
 <p class="ch">Where do customers message you?</p>
-<div class="row on"><span>Telegram</span><span>Available now</span></div>
-<div class="row"><span>Instagram</span><span>After Meta approval</span></div>
+<div class="row on"><span>Instagram DMs</span><span>Simulator live</span></div>
+<div class="row"><span>Telegram</span><span>Backup channel</span></div>
 </form>
 </div></section>
 
 <section class="sec alt"><div class="w rv">
 <h2>Where we are headed</h2>
 <div class="rm">
-<div class="now"><b>Now</b><p>Telegram bot, live stock from your sheet, safe handoff to the owner.</p></div>
-<div><b>Next</b><p>Instagram DMs after Meta approval, and store connection from a Shopify or WooCommerce link.</p></div>
-<div><b>Later</b><p>Multiple stores per owner, billing, and more store platforms.</p></div>
+<div class="now"><b>Now</b><p>Instagram DM web simulator, live stock from your sheet, safe handoff to the owner.</p></div>
+<div><b>Next</b><p>Official Instagram Cloud API DMs after Meta approval.</p></div>
+<div><b>Later</b><p>Multiple stores per owner, billing, and multi-platform integrations.</p></div>
 </div>
 </div></section>
 </main>
@@ -419,7 +442,7 @@ a{color:inherit}
 
 <div class="dock" id="dock"><a class="btn pri" href="#connect" data-gate="connect">Connect your store</a></div>
 
-<!-- Login Modal (Hevy Style matching requested UI) -->
+<!-- Login Modal -->
 <div class="m-ov" id="authModal" hidden role="dialog" aria-modal="true" aria-labelledby="authTitle">
   <div class="m-bx" id="emailAuthView">
     <button type="button" class="m-x" id="authClose" aria-label="Close">&times;</button>
@@ -427,7 +450,6 @@ a{color:inherit}
     
     <p class="m-err" id="authErr" role="alert"></p>
 
-    <!-- Google Login Button -->
     <button type="button" class="g-btn" id="googleAuthBtn">
       <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#4285F4" d="M23.49 12.27c0-.79-.07-1.54-.19-2.27H12v4.51h6.47c-.29 1.58-1.14 2.91-2.4 3.8v3.16h3.88c2.27-2.09 3.54-5.17 3.54-9.2z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.16c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.11-6.72-4.96H1.29v3.26C3.26 21.3 7.31 24 12 24z"/><path fill="#FBBC05" d="M5.28 14.13c-.24-.72-.38-1.49-.38-2.13s.14-1.41.38-2.13V6.61H1.29C.47 8.24 0 10.06 0 12s.47 3.76 1.29 5.39l3.99-3.26z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.31 0 3.26 2.7 1.29 6.61l3.99 3.26c.95-2.85 3.6-4.96 6.72-4.96z"/></svg>
       <span id="googleBtnText">Login with Google</span>
@@ -467,7 +489,6 @@ const sleep=ms=>new Promise(r=>setTimeout(r,RM?0:ms));
 const E=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e};
 const fmt=n=>'₹'+Number(n).toLocaleString('en-IN');
 
-/* API base URL: uses ?api=... query param, saved localStorage, or default Render backend */
 const urlParams=new URLSearchParams(location.search);
 const apiQ=urlParams.get('api');
 if(apiQ&&/^(https:\/\/|http:\/\/(localhost|127\.0\.0\.1)[:\/])/.test(apiQ)){
@@ -499,27 +520,25 @@ async function apiFetch(path,opts={}){
   return res.json();
 }
 
-/* Fallback rule-based replies if backend is offline */
 function fallbackReply(t){
   const q=t.toLowerCase();
   if(/human|person|owner|refund|complain|damag|wrong|discount|% ?off|negotiat|custom/.test(q))
-    return{h:1,r:'Thank you for your message. I have passed this to the owner, who will reply soon.',w:'Needs a person'};
+    return{h:1,r:'Bot paused. Handed off to human seller (@lumen_jewellery). They will reply shortly.',w:'Needs a person'};
   const pr=P.find(x=>x.a.some(a=>q.includes(a))||q.includes(x.n.toLowerCase()));
   if(/deliver|shipping|ship/.test(q)){
     const c=CITIES.find(c=>q.includes(c));
     if(c)return{r:'Yes, we deliver to '+c[0].toUpperCase()+c.slice(1)+' in 2 to 4 days.'};
-    return{h:1,r:'I have asked the owner to confirm delivery to your city.',w:'City not in delivery list'};
+    return{h:1,r:'Bot paused. Handed off to human seller to confirm delivery.',w:'City not in delivery list'};
   }
   if(/return|exchange/.test(q))return{r:'Unused items can be returned within 7 days of delivery.'};
   if(pr){
-    if(pr.s>0&&pr.s<=2)return{h:1,r:'Only a few left. The owner will confirm availability.',w:'Low stock: '+pr.n};
+    if(pr.s>0&&pr.s<=2)return{h:1,r:'Only a few left. Handed off to seller to confirm availability.',w:'Low stock: '+pr.n};
     if(!pr.s)return{r:pr.n+': sold out at the moment.'};
     return{r:pr.n+': '+(/stock|available|have/.test(q)?'in stock.':fmt(pr.p)+', in stock.')};
   }
-  return{h:1,r:'I am not sure about that, so I have passed it to the owner.',w:'No matching product or policy'};
+  return{h:1,r:'Bot paused. Handed off to human seller.',w:'No matching product or policy'};
 }
 
-/* Sync UI cards with product array P */
 function renderProducts(){
   const cards=$$('#tags .tg');
   cards.forEach((li,i)=>{
@@ -542,7 +561,6 @@ function renderProducts(){
   }
 }
 
-/* Render Needs Owner Queue */
 const sync=()=>{$$('.cnt').forEach(e=>e.textContent=n);$('#qe').hidden=n>0};
 function renderQueueItem(item){
   const id=item.id||item.queue_id||'';
@@ -561,7 +579,6 @@ function addQ(t,w,id){
   sync();
 }
 
-/* Load initial state from FastAPI backend */
 async function syncFromBackend(){
   try{
     const prods=await apiFetch('/api/products');
@@ -577,7 +594,6 @@ async function syncFromBackend(){
       renderProducts();
     }
     apiOnline=true;
-    if(dnote)dnote.textContent='Connected to live ShelfTalk FastAPI backend ('+API_BASE+').';
   }catch(_){
     apiOnline=false;
   }
@@ -593,7 +609,6 @@ async function syncFromBackend(){
   }catch(_){}
 }
 
-/* Chat helpers */
 const scrollEnd=()=>th.scrollTo({top:th.scrollHeight,behavior:RM?'auto':'smooth'});
 const say=(c,t)=>{th.append(E('div','m '+c,t));scrollEnd()};
 async function typing(){const d=E('div','m sh ty');d.setAttribute('role','status');d.setAttribute('aria-label','ShelfTalk is typing');d.innerHTML='<i></i><i></i><i></i>';th.append(d);scrollEnd();await sleep(450);d.remove()}
@@ -606,13 +621,12 @@ async function ask(t){
     const data=await apiFetch('/api/chat',{method:'POST',body:JSON.stringify({text:t,source:'web'})});
     d.remove();
     apiOnline=true;
-    if(dnote)dnote.textContent='Connected to live ShelfTalk FastAPI backend ('+API_BASE+').';
     const replyText=data.reply||data.text||data.message||data.answer||'';
     const isHandoff=Boolean(data.handoff||data.status==='handoff'||data.needs_owner);
     const reason=data.reason||data.handoff_reason||'Needs owner';
     say('sh',replyText);
     if(isHandoff){
-      th.append(E('p','note','Sent to owner'));
+      th.append(E('p','note','Handed off to human seller'));
       await syncFromBackend();
       if(!$$('#ql .qr').some(el=>el.firstChild&&el.firstChild.childNodes[0]?.nodeValue===t)){
         addQ(t,reason,data.queue_id||data.id);
@@ -622,37 +636,32 @@ async function ask(t){
     d.remove();
     const r=fallbackReply(t);
     say('sh',r.r);
-    if(r.h){th.append(E('p','note','Sent to owner'));addQ(t,r.w)}
+    if(r.h){th.append(E('p','note','Handed off to human seller'));addQ(t,r.w)}
   }
   busy=false;
   scrollEnd();
 }
 
-/* Hero chat plays out message by message, then the controls open up */
 async function play(){
-  const s=[['me','How much are the silver hoops?'],['sh','The Silver Hoop Earrings are \u20B9799 and in stock.'],['me','20% off if I buy five?'],['sh','The owner will confirm that one.','Sent to owner']];
+  const s=[['me','How much are the silver hoops?'],['sh','The Silver Hoop Earrings are \u20B9799 and in stock.'],['me','20% off if I buy five?'],['sh','Bot paused. Handed off to human seller.','Handed off to human seller']];
   for(const[c,t,nt]of s){if(c==='sh')await typing();else await sleep(500);say(c,t);if(nt)th.append(E('p','note',nt))}
   busy=false;
 }
 $('#try').onclick=e=>{if(e.target.tagName==='BUTTON')ask(e.target.textContent)};
 $('#sf').onsubmit=e=>{e.preventDefault();const i=$('#si');ask(i.value);i.value=''};
 
-/* Resolve queue item (calls backend + updates UI) */
 $('#ql').onclick=async e=>{
   const b=e.target.closest('button');if(!b)return;
   const li=b.closest('li'),id=li.dataset.id;
   b.disabled=true;
   if(id&&apiOnline){
-    try{
-      await apiFetch('/api/queue/'+id+'/resolve',{method:'POST'});
-    }catch(_){
+    try{await apiFetch('/api/queue/'+id+'/resolve',{method:'POST'});}catch(_){
       try{await apiFetch('/api/queue/'+id,{method:'DELETE'})}catch(__){}
     }
   }
   li.remove();n=Math.max(0,$$('#ql .qr').length);sync();
 };
 
-/* Product sheet: stock steppers tick the number and call PATCH /api/products/{id}/stock */
 $('#tags').onclick=async e=>{
   const b=e.target.closest('button');if(!b)return;
   const li=b.closest('li'),i=[...li.parentNode.children].indexOf(li),p=P[i];
@@ -665,12 +674,9 @@ $('#tags').onclick=async e=>{
   s.className='s'+(v?v<=2?' low':'':' out');
   if(!i){const f=$('#fs');f.textContent=v;f.classList.remove('tk');void f.offsetWidth;f.classList.add('tk')}
   const pid=li.dataset.id||p.id||(i+1);
-  try{
-    await apiFetch('/api/products/'+pid+'/stock',{method:'PATCH',body:JSON.stringify({stock:v})});
-  }catch(_){}
+  try{await apiFetch('/api/products/'+pid+'/stock',{method:'PATCH',body:JSON.stringify({stock:v})});}catch(_){}
 };
 
-/* ===== Auth UI & Google Sign-In Logic ===== */
 const GOOGLE_CLIENT_ID='600249754701-oer54sfhga9qqfj3u408u6n4irtc34pj.apps.googleusercontent.com';
 const authModal=$('#authModal'),authTitle=$('#authTitle'),authErr=$('#authErr');
 const emailAuthView=$('#emailAuthView'),nameField=$('#nameField'),authName=$('#authName'),authEmail=$('#authEmail'),authPass=$('#authPass'),authSubmit=$('#authSubmit');
@@ -702,10 +708,7 @@ function updateNavAuthUI(){
     const label=E('span','',u.name||u.email);
     const outBtn=E('button','','Log out');
     outBtn.type='button';
-    outBtn.onclick=()=>{
-      localStorage.removeItem('shelftalk_user');
-      updateNavAuthUI();
-    };
+    outBtn.onclick=()=>{localStorage.removeItem('shelftalk_user');updateNavAuthUI();};
     chip.append(av,label,outBtn);
     $('#navActs').prepend(chip);
   }else{
@@ -777,7 +780,6 @@ $$('[data-gate]').forEach(btn=>{
   });
 });
 
-/* Email Form Submit */
 $('#authForm').onsubmit=e=>{
   e.preventDefault();
   authErr.classList.remove('show');
@@ -830,16 +832,13 @@ $('#authForm').onsubmit=e=>{
   }
 };
 
-/* Google Sign-In Action */
 googleAuthBtn.onclick=()=>{
   authErr.classList.remove('show');
-  
   if(location.protocol==='file:'){
-    authErr.textContent='Google OAuth requires an HTTP server (e.g. localhost or Vercel). It cannot run on file://';
+    authErr.textContent='Google OAuth requires an HTTP server. It cannot run on file://';
     authErr.classList.add('show');
     return;
   }
-
   if(window.google&&window.google.accounts&&window.google.accounts.oauth2){
     try {
       const client=google.accounts.oauth2.initTokenClient({
@@ -863,14 +862,13 @@ googleAuthBtn.onclick=()=>{
       authErr.classList.add('show');
     }
   } else {
-    authErr.textContent='Google Sign-In is still loading. Please check your internet connection or ad blocker.';
+    authErr.textContent='Google Sign-In is still loading. Please check your internet connection.';
     authErr.classList.add('show');
   }
 };
 
 updateNavAuthUI();
 
-/* Connect form: calls POST /api/store/connect and redirects to admin panel */
 const fm=$('#fm'),inp=$('#sl'),rb=$('#rb'),okEl=$('#ok'),erEl=$('#er');
 const valid=v=>{try{const u=new URL(v);return/^https?:$/.test(u.protocol)&&u.hostname.includes('.')}catch(_){return false}};
 
@@ -890,14 +888,14 @@ fm.onsubmit=async e=>{
   try{
     let res;
     try{
-      res=await apiFetch('/api/store/connect',{method:'POST',body:JSON.stringify({url:v, bot_handle:'@ShelfTalkBot'})});
+      res=await apiFetch('/api/store/connect',{method:'POST',body:JSON.stringify({url:v, bot_handle:'@lumen_jewellery'})});
     }catch(_){
       res={count:4, message:'Connected successfully!'};
     }
     
     localStorage.setItem('shelftalk_store', JSON.stringify({
       url: v,
-      bot: '@ShelfTalkBot',
+      bot: '@lumen_jewellery',
       productsCount: res.count || 4
     }));
 
@@ -914,7 +912,6 @@ fm.onsubmit=async e=>{
 };
 inp.oninput=()=>{if(fm.dataset.s==='error')fm.dataset.s='idle'};
 
-/* Scroll reveal + hide dock while the form is on screen */
 const io=new IntersectionObserver(es=>es.forEach(x=>{if(x.isIntersecting){x.target.classList.add('in');io.unobserve(x.target)}}),{threshold:.12});
 $$('.rv').forEach(e=>io.observe(e));
 new IntersectionObserver(es=>$('#dock').classList.toggle('hide',es[0].isIntersecting)).observe($('#connect'));
@@ -923,4 +920,4 @@ busy=true;sync();syncFromBackend();setTimeout(play,RM?0:600);
 })();
 </script>
 </body>
-</html>[cite: 16]
+</html>[cite: 13]
