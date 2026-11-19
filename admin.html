@@ -3,91 +3,283 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>ShelfTalk: Store Admin Panel</title>
+<title>ShelfTalk: Instagram DM Admin & Simulator</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&display=swap">
 <style>
-:root{--paper:#F3F0E6;--card:#FBF9F2;--ink:#1E1C17;--mut:#5A564B;--rule:#D9D3C0;--acc:#1D3FA8;--on:#fff;--bad:#A3260F;--ease:cubic-bezier(.2,.7,.2,1)}
+:root{--paper:#F3F0E6;--card:#FBF9F2;--ink:#1E1C17;--mut:#5A564B;--rule:#D9D3C0;--acc:#1D3FA8;--on:#fff;--bad:#A3260F;--ig:#E1306C}
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:var(--paper);color:var(--ink);font:400 1rem/1.5 system-ui,sans-serif;padding:2rem 1rem}
-.w{width:min(100% - 2rem, 64rem);margin-inline:auto}
-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:2.5rem;border-bottom:2px solid var(--ink);padding-bottom:1rem}
-h1{font-family:"Bricolage Grotesque",sans-serif;font-size:2rem;font-weight:800}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.5rem;margin-bottom:2rem}
-.card{background:var(--card);border:2px solid var(--ink);border-radius:10px;padding:1.5rem;box-shadow:4px 4px 0 var(--ink);margin-bottom:1.5rem}
-.card h3{font-family:"Bricolage Grotesque",sans-serif;font-size:1.25rem;margin-bottom:.75rem}
-.stat{font-size:2.25rem;font-weight:800;font-family:"Bricolage Grotesque",sans-serif;color:var(--acc);margin-bottom:.5rem}
-.btn{display:inline-flex;align-items:center;justify-content:center;min-height:2.75rem;padding:0 1.25rem;border:2px solid var(--ink);border-radius:6px;background:var(--acc);color:var(--on);font-weight:600;cursor:pointer;text-decoration:none}
-.btn:hover{opacity:.9}
-.log-list{list-style:none;margin-top:1rem}
-.log-item{padding:.75rem 0;border-top:1px solid var(--rule);font-size:.9rem}
-.log-item small{display:block;color:var(--mut)}
+.w{width:min(100% - 1rem, 72rem);margin-inline:auto}
+header{display:flex;flex-wrap:wrap;gap:1rem;justify-content:space-between;align-items:center;margin-bottom:2rem;border-bottom:2px solid var(--ink);padding-bottom:1rem}
+h1{font-family:"Bricolage Grotesque",sans-serif;font-size:1.85rem;font-weight:800}
+.badge-ig{display:inline-flex;align-items:center;gap:.4rem;font-size:.82rem;font-weight:700;padding:.25rem .75rem;border-radius:999px;background:rgba(225,48,108,0.12);color:var(--ig);border:1.5px solid var(--ig)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1.25rem;margin-bottom:1.75rem}
+.main-split{display:grid;grid-template-columns:1fr;gap:1.5rem;margin-bottom:1.75rem}
+@media(min-width:920px){.main-split{grid-template-columns:1.05fr 0.95fr;align-items:start}}
+.card{background:var(--card);border:2px solid var(--ink);border-radius:12px;padding:1.4rem;box-shadow:4px 4px 0 var(--ink);margin-bottom:1.25rem}
+.card h3{font-family:"Bricolage Grotesque",sans-serif;font-size:1.25rem;margin-bottom:.5rem}
+.stat{font-size:2.1rem;font-weight:800;font-family:"Bricolage Grotesque",sans-serif;color:var(--acc);margin-bottom:.25rem}
+.mut{color:var(--mut);font-size:.92rem}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:2.65rem;padding:0 1.15rem;border:2px solid var(--ink);border-radius:6px;background:var(--acc);color:var(--on);font-weight:600;cursor:pointer;text-decoration:none;font-size:.92rem}
+.btn:hover{opacity:.92}
+.btn.sec{background:transparent;color:var(--ink)}
+
+/* Authentic Instagram Phone Simulator in Admin */
+.ig-phone{background:#ffffff;color:#121212;border:3px solid #121212;border-radius:24px;box-shadow:6px 6px 0 var(--ink);overflow:hidden;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+.ig-head{display:flex;align-items:center;gap:.7rem;padding:.75rem 1rem;border-bottom:1px solid #e5e5e5;background:#fafafa}
+.av-ring{padding:2px;border-radius:50%;background:linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);display:grid;place-items:center}
+.av{width:2.2rem;height:2.2rem;border-radius:50%;background:#121212;color:#fff;border:2px solid #fff;display:grid;place-items:center;font-weight:800;font-size:.95rem}
+.ig-head-txt{flex:1;min-width:0}
+.ig-head-txt b{display:flex;align-items:center;gap:.3rem;font-size:.92rem}
+.ig-head-txt span{font-size:.75rem;color:#737373}
+.v-badge{display:inline-grid;place-items:center;width:13px;height:13px;border-radius:50%;background:#0095f6;color:#fff;font-size:8px;font-weight:900}
+.pill{font-size:.7rem;font-weight:700;padding:.2rem .55rem;border-radius:999px;background:rgba(0,149,246,0.12);color:#0095f6}
+.pill.paused{background:rgba(225,48,108,0.15);color:#E1306C}
+.ig-thread{height:20rem;overflow-y:auto;padding:1rem;display:flex;flex-direction:column;gap:.55rem;background:#fff}
+.m{max-width:82%;padding:.6rem .9rem;border-radius:18px;font-size:.9rem;line-height:1.4;overflow-wrap:anywhere}
+.me{align-self:flex-end;background:#3797f0;color:#fff;border-bottom-right-radius:4px}
+.sh{align-self:flex-start;background:#efefef;color:#121212;border-bottom-left-radius:4px}
+.owner-msg{align-self:flex-start;background:#fdecef;border:1px solid #f5c2c7;color:#842029;border-bottom-left-radius:4px}
+.note{align-self:center;margin:.25rem 0;padding:.2rem .75rem;border-radius:999px;background:rgba(225,48,108,0.12);border:1px solid rgba(225,48,108,0.35);color:#E1306C;font-size:.74rem;font-weight:700;text-align:center}
+.ig-chips{display:flex;gap:.4rem;overflow-x:auto;padding:.5rem .85rem;border-top:1px solid #efefef;background:#fafafa;scrollbar-width:none}
+.ig-chips button{flex:none;padding:.35rem .75rem;border:1px solid #d1d5db;border-radius:999px;background:#fff;font-size:.78rem;cursor:pointer}
+.ig-chips button:hover{border-color:#0095f6;color:#0095f6}
+.ig-input{display:flex;gap:.5rem;padding:.65rem .85rem;border-top:1px solid #efefef;background:#fff}
+.ig-input input{flex:1;min-height:2.4rem;padding:0 .85rem;border:1.5px solid #d1d5db;border-radius:999px;font-size:.9rem;outline:none}
+.ig-input button{padding:0 1rem;border:0;border-radius:999px;background:#0095f6;color:#fff;font-weight:700;font-size:.85rem;cursor:pointer}
+
+.log-list{list-style:none;margin-top:.75rem}
+.log-item{padding:.75rem 0;border-top:1px solid var(--rule);font-size:.9rem;display:flex;justify-content:space-between;align-items:center;gap:.75rem}
+.log-item small{display:block;color:var(--mut);margin-top:.15rem}
 </style>
 </head>
 <body>
 <div class="w">
   <header>
-    <h1>ShelfTalk Admin Panel</h1>
-    <a href="index.html" class="btn" style="background:transparent;color:var(--ink)">Log out / Home</a>
+    <div>
+      <h1>ShelfTalk Store Admin</h1>
+      <span class="badge-ig">&#9679; Instagram DM Simulator Mode</span>
+    </div>
+    <div style="display:flex;gap:.5rem">
+      <a href="index.html" class="btn sec">&larr; Back to Landing Page</a>
+    </div>
   </header>
 
   <div class="grid">
-    <div class="card">
-      <h3>Store Status</h3>
-      <p class="stat" id="botStatus">Active</p>
-      <p class="mut">Telegram Bot: <b id="botHandle">@ShelfTalkBot</b></p>
+    <div class="card" style="margin-bottom:0">
+      <h3>Instagram Account</h3>
+      <p class="stat" id="igHandleStat">@yojityadav</p>
+      <p class="mut">AI replies active · Escalations pause bot in-thread.</p>
     </div>
-    <div class="card">
+    <div class="card" style="margin-bottom:0">
       <h3>Synced Products</h3>
       <p class="stat" id="prodCount">4</p>
       <p class="mut">Prices and stock verified live from your sheet.</p>
     </div>
-    <div class="card">
-      <h3>Needs Owner Queue</h3>
-      <p class="stat" id="queueCount">3</p>
-      <p class="mut">Customer chats waiting for human review.</p>
+    <div class="card" style="margin-bottom:0">
+      <h3>Needs Owner Takeover</h3>
+      <p class="stat" id="queueCount">0</p>
+      <p class="mut">Instagram DMs waiting for human response.</p>
     </div>
   </div>
 
-  <div class="card">
-    <h3>Connect Personal Telegram</h3>
-    <p class="mut">Enter your personal handle so the bot can hand over unhandled inquiries directly to you.</p>
-    <div style="display:flex; gap:0.5rem; margin-top:1rem;">
-      <input type="text" id="ownerTgInput" placeholder="@YourPersonalUsername" style="flex:1; min-height:2.75rem; padding:0 0.75rem; border:2px solid var(--ink); border-radius:6px;">
-      <button type="button" class="btn" id="saveOwnerTgBtn">Save Handle</button>
+  <div class="main-split">
+    <!-- Left Column: Live Instagram DM Simulator -->
+    <div>
+      <div class="ig-phone">
+        <div class="ig-head">
+          <div class="av-ring"><span class="av" id="simAv">Y</span></div>
+          <div class="ig-head-txt">
+            <b><span id="simHandleText">yojityadav</span> <span class="v-badge">&#10003;</span></b>
+            <span>Instagram Direct · Customer View Simulator</span>
+          </div>
+          <span class="pill" id="simPill">AI Active</span>
+        </div>
+        <div class="ig-thread" id="igThread"></div>
+        <div class="ig-chips" id="igChips">
+          <button type="button">What products do you have?</button>
+          <button type="button">How much are the silver hoops?</button>
+          <button type="button">Do you deliver to Jaipur?</button>
+          <button type="button">Can I get a 25% discount?</button>
+        </div>
+        <form class="ig-input" id="igForm">
+          <input type="text" id="igInput" placeholder="Send a test customer DM..." autocomplete="off">
+          <button type="submit">Send DM</button>
+        </form>
+      </div>
     </div>
-    <p id="ownerTgStatus" style="font-size:0.85rem; margin-top:0.55rem; font-weight:600;"></p>
-  </div>
 
-  <div class="card">
-    <h3>Recent Customer Inquiries & Bot Logs</h3>
-    <ul class="log-list" id="logList">
-      <li class="log-item"><b>"How much are the silver hoops?"</b><br>Bot answered: "The Silver Hoop Earrings are ₹799 and in stock."<small>2 mins ago · Telegram</small></li>
-      <li class="log-item"><b>"Can I get 20% off if I buy five?"</b><br>Handed off to owner (Negotiation)<small>15 mins ago · Telegram</small></li>
-    </ul>
+    <!-- Right Column: Admin Settings, Takeover Queue, & Synced Products -->
+    <div>
+      <div class="card">
+        <h3>Store Instagram Handle</h3>
+        <p class="mut">Set your store's Instagram handle. When a customer asks something the AI cannot answer, ShelfTalk pauses the bot and hands the thread to this handle.</p>
+        <div style="display:flex; gap:0.5rem; margin-top:0.85rem;">
+          <input type="text" id="ownerIgInput" placeholder="@your_instagram_handle" style="flex:1; min-height:2.65rem; padding:0 0.75rem; border:2px solid var(--ink); border-radius:6px;">
+          <button type="button" class="btn" id="saveOwnerIgBtn">Save Handle</button>
+        </div>
+        <p id="ownerIgStatus" style="font-size:0.85rem; margin-top:0.5rem; font-weight:600;"></p>
+      </div>
+
+      <div class="card">
+        <h3>Needs Owner Queue (Instagram Escalations)</h3>
+        <p class="mut">DMs where the AI paused for human takeover appear here live:</p>
+        <ul class="log-list" id="queueList">
+          <li class="log-item"><span class="mut">Loading queue...</span></li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3>Live Synced Catalog</h3>
+        <ul class="log-list" id="prodList">
+          <li class="log-item"><span class="mut">Loading synced products...</span></li>
+        </ul>
+      </div>
+    </div>
   </div>
 </div>
 
 <script>
-const store = JSON.parse(localStorage.getItem('shelftalk_store') || '{"bot":"@ShelfTalkBot"}');
-if (store.bot) document.getElementById('botHandle').textContent = store.bot;
-if (store.productsCount) document.getElementById('prodCount').textContent = store.productsCount;
+const urlParams = new URLSearchParams(window.location.search);
+const apiBase = (urlParams.get('api') || localStorage.getItem('shelftalk_api') || 'https://shelftalk-9df9.onrender.com').replace(/\/+$/, '');
+const store = JSON.parse(localStorage.getItem('shelftalk_store') || '{"ig_handle":"@yojityadav"}');
 
-document.getElementById('saveOwnerTgBtn').addEventListener('click', async () => {
-  const rawInput = document.getElementById('ownerTgInput').value.trim();
-  const username = rawInput.replace('@', '');
-  const status = document.getElementById('ownerTgStatus');
+let currentHandle = (store.ig_handle || store.bot || '@yojityadav').replace(/^@/, '');
+
+function setHandleUI(handle) {
+  currentHandle = handle.replace(/^@/, '').trim() || 'yojityadav';
+  document.getElementById('igHandleStat').textContent = '@' + currentHandle;
+  document.getElementById('simHandleText').textContent = currentHandle;
+  document.getElementById('simAv').textContent = currentHandle[0].toUpperCase();
+  document.getElementById('ownerIgInput').value = '@' + currentHandle;
+  store.ig_handle = '@' + currentHandle;
+  localStorage.setItem('shelftalk_store', JSON.stringify(store));
+}
+setHandleUI(currentHandle);
+
+const thread = document.getElementById('igThread');
+const simPill = document.getElementById('simPill');
+
+function addBubble(cls, text) {
+  const d = document.createElement('div');
+  d.className = 'm ' + cls;
+  d.textContent = text;
+  thread.appendChild(d);
+  thread.scrollTop = thread.scrollHeight;
+}
+
+function addNote(text) {
+  const p = document.createElement('p');
+  p.className = 'note';
+  p.textContent = text;
+  thread.appendChild(p);
+  thread.scrollTop = thread.scrollHeight;
+}
+
+addBubble('sh', `Hi! Welcome to @${currentHandle} on Instagram. Ask me about product prices, stock, sizes, or delivery!`);
+
+async function refreshDashboard() {
+  try {
+    const [pRes, qRes] = await Promise.all([
+      fetch(`${apiBase}/api/products`),
+      fetch(`${apiBase}/api/queue`)
+    ]);
+    if (pRes.ok) {
+      const prods = await pRes.json();
+      document.getElementById('prodCount').textContent = prods.length;
+      const pl = document.getElementById('prodList');
+      pl.innerHTML = '';
+      prods.forEach(p => {
+        const li = document.createElement('li');
+        li.className = 'log-item';
+        li.innerHTML = `<div><b>${p.name}</b><small>₹${p.price} · ${p.status} (${p.stock} left)</small></div>`;
+        pl.appendChild(li);
+      });
+    }
+    if (qRes.ok) {
+      const q = await qRes.json();
+      document.getElementById('queueCount').textContent = q.length;
+      const ql = document.getElementById('queueList');
+      ql.innerHTML = '';
+      if (!q.length) {
+        ql.innerHTML = '<li class="log-item"><span class="mut">No Instagram DMs waiting for owner right now.</span></li>';
+      } else {
+        q.forEach(item => {
+          const li = document.createElement('li');
+          li.className = 'log-item';
+          const msgText = item.customer_message || item.text || item.message || 'Customer DM';
+          const reason = item.reason || 'Needs owner review';
+          li.innerHTML = `<div><b>"${msgText}"</b><small>${reason} · Instagram DM</small></div>`;
+          const btn = document.createElement('button');
+          btn.className = 'btn';
+          btn.textContent = 'Reply & Resolve';
+          btn.onclick = async () => {
+            btn.disabled = true;
+            try { await fetch(`${apiBase}/api/queue/${item.id}/resolve`, { method: 'POST' }); } catch (_) {}
+            addBubble('owner-msg', `[Owner @${currentHandle}]: Thanks for reaching out! I'm reviewing your request personally now.`);
+            simPill.textContent = 'AI Active';
+            simPill.classList.remove('paused');
+            refreshDashboard();
+          };
+          li.appendChild(btn);
+          ql.appendChild(li);
+        });
+      }
+    }
+  } catch (_) {}
+}
+
+async function sendSimDM(text) {
+  text = text.trim();
+  if (!text) return;
+  addBubble('me', text);
+  try {
+    const res = await fetch(`${apiBase}/api/chat`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text })
+    });
+    const data = await res.json();
+    addBubble('sh', data.reply || 'Thanks for your message!');
+    if (data.status === 'needs_owner' || String(data.status).includes('owner')) {
+      simPill.textContent = 'AI Paused · Owner Takeover';
+      simPill.classList.add('paused');
+      addNote(`Bot Paused · Escalated to @${currentHandle} in Needs Owner Queue`);
+    } else {
+      simPill.textContent = 'AI Active';
+      simPill.classList.remove('paused');
+    }
+    refreshDashboard();
+  } catch (err) {
+    addBubble('sh', 'Error reaching backend server. Please verify Render is awake.');
+  }
+}
+
+document.getElementById('igForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const inp = document.getElementById('igInput');
+  sendSimDM(inp.value);
+  inp.value = '';
+});
+
+document.getElementById('igChips').addEventListener('click', e => {
+  if (e.target.tagName === 'BUTTON') sendSimDM(e.target.textContent);
+});
+
+document.getElementById('saveOwnerIgBtn').addEventListener('click', async () => {
+  const rawInput = document.getElementById('ownerIgInput').value.trim();
+  const username = rawInput.replace(/^@/, '');
+  const status = document.getElementById('ownerIgStatus');
 
   if (!username) {
-    status.style.color = 'var(--bad, #e11d48)';
-    status.textContent = 'Please enter a valid Telegram username.';
+    status.style.color = 'var(--bad)';
+    status.textContent = 'Please enter a valid Instagram handle.';
     return;
   }
 
   status.style.color = '#555';
-  status.textContent = 'Connecting to server...';
-
-  const urlParams = new URLSearchParams(window.location.search);
-  const apiBase = urlParams.get('api') || 'https://shelftalk-9df9.onrender.com';
+  status.textContent = 'Saving Instagram handle...';
+  setHandleUI(username);
 
   try {
     const res = await fetch(`${apiBase}/api/store/owner-telegram`, {
@@ -95,16 +287,17 @@ document.getElementById('saveOwnerTgBtn').addEventListener('click', async () => 
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ owner_username: username })
     });
-    if (!res.ok) throw new Error('Failed to update owner username');
-    
+    if (!res.ok) throw new Error('Backend error');
     const data = await res.json();
-    status.style.color = 'var(--acc, #16a34a)';
-    status.textContent = `Saved! Direct chats will now link to @${data.owner_username}.`;
-  } catch (err) {
-    status.style.color = 'var(--bad, #e11d48)';
-    status.textContent = 'Error: ' + err.message;
+    status.style.color = 'var(--acc)';
+    status.textContent = `Saved! Escalated Instagram DMs now route to @${data.owner_username}.`;
+  } catch (_) {
+    status.style.color = 'var(--acc)';
+    status.textContent = `Saved locally! Simulator is now using @${username}.`;
   }
 });
+
+refreshDashboard();
 </script>
 </body>
-</html>[cite: 15]
+</html>
