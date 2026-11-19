@@ -24,7 +24,7 @@ async def lifespan(app):
 app = FastAPI(title="ShelfTalk API", lifespan=lifespan)
 
 origins = [o.strip() for o in os.getenv(
-    "ALLOWED_ORIGINS", "http://localhost:8080,http://127.0.0.1:8080").split(",") if o.strip()]
+    "ALLOWED_ORIGINS", "http://localhost:8080,http://127.0.0.1:8080,https://shelftalk-sandy.vercel.app").split(",") if o.strip()]
 app.add_middleware(CORSMiddleware, allow_origins=origins,
                    allow_methods=["GET", "POST", "PATCH"], allow_headers=["Content-Type"])
 

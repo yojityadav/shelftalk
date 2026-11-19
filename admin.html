@@ -75,32 +75,35 @@ const store=JSON.parse(localStorage.getItem('shelftalk_store')||'{"bot":"@ShelfT
 if(store.bot) document.getElementById('botHandle').textContent = store.bot;
 if(store.productsCount) document.getElementById('prodCount').textContent = store.productsCount;
 </script>
-<script>
-  document.getElementById('saveOwnerTgBtn').addEventListener('click', async () => {
-    const rawInput = document.getElementById('ownerTgInput').value.trim();
-    const username = rawInput.replace('@', '');
-    const status = document.getElementById('ownerTgStatus');
+document.getElementById('saveOwnerTgBtn').addEventListener('click', async () => {
+  const rawInput = document.getElementById('ownerTgInput').value.trim();
+  const username = rawInput.replace('@', '');
+  const status = document.getElementById('ownerTgStatus');
 
-    if (!username) {
-      status.style.color = 'var(--bad, #e11d48)';
-      status.textContent = 'Please enter a valid Telegram username.';
-      return;
-    }
+  if (!username) {
+    status.style.color = 'var(--bad, #e11d48)';
+    status.textContent = 'Please enter a valid Telegram username.';
+    return;
+  }
 
-    try {
-      const res = await fetch('https://shelftalk-9df0.onrender.com/api/store/owner-telegram', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ owner_username: username })
-      });
-      if (!res.ok) throw new Error('Failed to update owner username');
-      status.style.color = 'var(--acc, #16a34a)';
-      status.textContent = `Saved! Inquiries requiring escalation will link to @${username}.`;
-    } catch (err) {
-      status.style.color = 'var(--bad, #e11d48)';
-      status.textContent = err.message;
-    }
-  });
+  // Grabs ?api= parameter from URL or defaults to your live Render backend
+  const urlParams = new URLSearchParams(window.location.search);
+  const apiBase = urlParams.get('api') || 'https://shelftalk-9df9.onrender.com';
+
+  try {
+    const res = await fetch(`${apiBase}/api/store/owner-telegram`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ owner_username: username })
+    });
+    if (!res.ok) throw new Error('Failed to update owner username');
+    status.style.color = 'var(--acc, #16a34a)';
+    status.textContent = `Saved! Inquiries requiring escalation will link to @${username}.`;
+  } catch (err) {
+    status.style.color = 'var(--bad, #e11d48)';
+    status.textContent = err.message;
+  }
+});
 </script>
 </body>
 </html>
