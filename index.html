@@ -8,11 +8,11 @@
 <meta name="color-scheme" content="light dark">
 <title>ShelfTalk: AI replies for small online stores</title>
 <meta name="description" content="ShelfTalk answers customer DMs about price, stock, size and delivery using only your real store data, and hands off to you when unsure.">
-<link rel="canonical" href="https://getshelftalk.netlify.app/">
+<link rel="canonical" href="https://shelftalk-sandy.vercel.app/">
 <meta property="og:type" content="website">
 <meta property="og:title" content="ShelfTalk: AI replies for small online stores">
 <meta property="og:description" content="Answers customer DMs from your own product sheet and policy. If it is not sure, it hands the chat to you.">
-<meta property="og:url" content="https://getshelftalk.netlify.app/">
+<meta property="og:url" content="https://shelftalk-sandy.vercel.app/">
 <meta name="twitter:card" content="summary">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M6 3h20v26H6z' fill='%231D3FA8'/%3E%3Ccircle cx='16' cy='9' r='3' fill='%23F3F0E6'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -467,10 +467,13 @@ const sleep=ms=>new Promise(r=>setTimeout(r,RM?0:ms));
 const E=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e};
 const fmt=n=>'₹'+Number(n).toLocaleString('en-IN');
 
-/* API base URL: uses ?api=... query param, saved localStorage, or localhost:8000 */
+/* API base URL: uses ?api=... query param, saved localStorage, or default Render backend */
 const urlParams=new URLSearchParams(location.search);
-const apiQ=urlParams.get('api');if(apiQ&&/^(https:\/\/|http:\/\/(localhost|127\.0\.0\.1)[:\/])/.test(apiQ))localStorage.setItem('shelftalk_api',apiQ.replace(/\/+$/,''));
-const API_BASE=localStorage.getItem('shelftalk_api')||(/^(localhost|127\.0\.0\.1)$/.test(location.hostname)?'http://127.0.0.1:8000':'');
+const apiQ=urlParams.get('api');
+if(apiQ&&/^(https:\/\/|http:\/\/(localhost|127\.0\.0\.1)[:\/])/.test(apiQ)){
+  localStorage.setItem('shelftalk_api',apiQ.replace(/\/+$/,''));
+}
+const API_BASE=localStorage.getItem('shelftalk_api')||(/^(localhost|127\.0\.0\.1)$/.test(location.hostname)?'http://127.0.0.1:8000':'https://shelftalk-9df9.onrender.com');
 
 let P=[
   {id:1,n:'Silver Hoop Earrings',a:['hoop','earring','silver'],p:799,s:12},
@@ -807,7 +810,6 @@ $('#authForm').onsubmit=e=>{
     completeLogin({email,name:displayName,provider:'email'});
   }else{
     if(!accounts[email]){
-      // Auto-create or demo login if demo account
       const displayName=email.split('@')[0];
       accounts[email]={email,name:displayName,pass,provider:'email'};
       saveRegisteredUsers(accounts);
@@ -833,7 +835,7 @@ googleAuthBtn.onclick=()=>{
   authErr.classList.remove('show');
   
   if(location.protocol==='file:'){
-    authErr.textContent='Google OAuth requires an HTTP server (e.g. localhost or Netlify). It cannot run on file://';
+    authErr.textContent='Google OAuth requires an HTTP server (e.g. localhost or Vercel). It cannot run on file://';
     authErr.classList.add('show');
     return;
   }
@@ -867,6 +869,7 @@ googleAuthBtn.onclick=()=>{
 };
 
 updateNavAuthUI();
+
 /* Connect form: calls POST /api/store/connect and redirects to admin panel */
 const fm=$('#fm'),inp=$('#sl'),rb=$('#rb'),okEl=$('#ok'),erEl=$('#er');
 const valid=v=>{try{const u=new URL(v);return/^https?:$/.test(u.protocol)&&u.hostname.includes('.')}catch(_){return false}};
@@ -901,7 +904,7 @@ fm.onsubmit=async e=>{
     fm.dataset.s='ok';
     okEl.textContent='Connected! Redirecting to your admin dashboard…';
     await sleep(800);
-    window.location.href = 'admin.html';
+    window.location.href = `admin.html?api=${encodeURIComponent(API_BASE)}`;
   }catch(err){
     erEl.textContent=err.message||'Could not connect store. Make sure the Google Sheet is shared publicly.';
     fm.dataset.s='error';
@@ -920,4 +923,4 @@ busy=true;sync();syncFromBackend();setTimeout(play,RM?0:600);
 })();
 </script>
 </body>
-</html>
+</html>[cite: 16]
