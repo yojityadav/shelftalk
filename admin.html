@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>ShelfTalk: Store Admin Panel</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&display=swap">
+<style>
+:root{--paper:#F3F0E6;--card:#FBF9F2;--ink:#1E1C17;--mut:#5A564B;--rule:#D9D3C0;--acc:#1D3FA8;--on:#fff;--bad:#A3260F;--ease:cubic-bezier(.2,.7,.2,1)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--paper);color:var(--ink);font:400 1rem/1.5 system-ui,sans-serif;padding:2rem 1rem}
+.w{width:min(100% - 2rem, 64rem);margin-inline:auto}
+header{display:flex;justify-content:space-between;align-items:center;margin-bottom:2.5rem;border-bottom:2px solid var(--ink);padding-bottom:1rem}
+h1{font-family:"Bricolage Grotesque",sans-serif;font-size:2rem;font-weight:800}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.5rem;margin-bottom:2rem}
+.card{background:var(--card);border:2px solid var(--ink);border-radius:10px;padding:1.5rem;box-shadow:4px 4px 0 var(--ink)}
+.card h3{font-family:"Bricolage Grotesque",sans-serif;font-size:1.25rem;margin-bottom:.75rem}
+.stat{font-size:2.25rem;font-weight:800;font-family:"Bricolage Grotesque",sans-serif;color:var(--acc);margin-bottom:.5rem}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:2.75rem;padding:0 1.25rem;border:2px solid var(--ink);border-radius:6px;background:var(--acc);color:var(--on);font-weight:600;cursor:pointer;text-decoration:none}
+.btn:hover{opacity:.9}
+.log-list{list-style:none;margin-top:1rem}
+.log-item{padding:.75rem 0;border-top:1px solid var(--rule);font-size:.9rem}
+.log-item small{display:block;color:var(--mut)}
+</style>
+</head>
+<body>
+<div class="w">
+  <header>
+    <h1>ShelfTalk Admin Panel</h1>
+    <a href="index.html" class="btn" style="background:transparent;color:var(--ink)">Log out / Home</a>
+  </header>
+
+  <div class="grid">
+    <div class="card">
+      <h3>Store Status</h3>
+      <p class="stat" id="botStatus">Active</p>
+      <p class="mut">Telegram Bot: <b id="botHandle">@ShelfTalkBot</b></p>
+    </div>
+    <div class="card">
+      <h3>Synced Products</h3>
+      <p class="stat" id="prodCount">4</p>
+      <p class="mut">Prices and stock verified live from your sheet.</p>
+    </div>
+    <div class="card">
+      <h3>Needs Owner Queue</h3>
+      <p class="stat" id="queueCount">3</p>
+      <p class="mut">Customer chats waiting for human review.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Recent Customer Inquiries & Bot Logs</h3>
+    <ul class="log-list" id="logList">
+      <li class="log-item"><b>"How much are the silver hoops?"</b><br>Bot answered: "The Silver Hoop Earrings are ₹799 and in stock."<small>2 mins ago · Telegram</small></li>
+      <li class="log-item"><b>"Can I get 20% off if I buy five?"</b><br>Handed off to owner (Negotiation)<small>15 mins ago · Telegram</small></li>
+    </ul>
+  </div>
+</div>
+
+<script>
+const store=JSON.parse(localStorage.getItem('shelftalk_store')||'{"bot":"@ShelfTalkBot"}');
+if(store.bot) document.getElementById('botHandle').textContent = store.bot;
+if(store.productsCount) document.getElementById('prodCount').textContent = store.productsCount;
+</script>
+</body>
+</html>

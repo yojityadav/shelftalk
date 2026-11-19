@@ -1,0 +1,4 @@
+# Store policy. One "key: value" per line. Edit freely; read fresh on every message.
+delivery_cities: jaipur, delhi, mumbai, bengaluru, pune
+delivery_days: 2 to 4
+return_policy: Unused items can be returned within 7 days of delivery.
