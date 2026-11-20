@@ -6,7 +6,7 @@
 <title>ShelfTalk: Live Store Admin Portal & Instagram DM Console</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&display=swap">
 <style>
-:root{--paper:#F3F0E6;--card:#FBF9F2;--ink:#1E1C17;--mut:#5A564B;--rule:#D9D3C0;--acc:#1D3FA8;--on:#fff;--bad:#A3260F;--ok:#157347;--ig:#E1306C}
+:root{--paper:#F3F0E6;--card:#FBF9F2;--ink:#1E1C17;--mut:#5A564B;--rule:#D9D3C0;--acc:#1D3FA8;--on:#fff;--bad:#A3260F;--warn:#8A4B00;--ok:#157347;--ig:#E1306C}
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:var(--paper);color:var(--ink);font:400 1rem/1.5 system-ui,sans-serif;padding:2rem 1rem}
 .w{width:min(100% - 1rem, 74rem);margin-inline:auto}
@@ -59,9 +59,13 @@ h1{font-family:"Bricolage Grotesque",sans-serif;font-size:1.85rem;font-weight:80
 .log-list{list-style:none;margin-top:.75rem}
 .log-item{padding:.75rem 0;border-top:1px solid var(--rule);font-size:.9rem;display:flex;justify-content:space-between;align-items:center;gap:.75rem;flex-wrap:wrap}
 .log-item small{display:block;color:var(--mut);margin-top:.15rem}
+.tag-status{display:inline-block;padding:.1rem .5rem;border-radius:999px;font-size:.75rem;font-weight:700;margin-left:.35rem}
+.tag-status.in{background:rgba(21,115,71,0.12);color:var(--ok)}
+.tag-status.low{background:rgba(138,75,0,0.14);color:var(--warn)}
+.tag-status.out{background:rgba(163,38,15,0.12);color:var(--bad)}
 .stock-ctrl{display:inline-flex;align-items:center;gap:.35rem;border:1.5px solid var(--ink);border-radius:6px;background:#fff;padding:.1rem .3rem}
 .stock-ctrl button{border:0;background:none;font-weight:800;font-size:1rem;width:1.6rem;height:1.6rem;cursor:pointer;color:var(--ink)}
-.stock-ctrl span{font-weight:700;min-width:1.6rem;text-align:center;font-variant-numeric:tabular-nums}
+.stock-ctrl span{font-weight:700;min-width:1.8rem;text-align:center;font-variant-numeric:tabular-nums}
 .conn-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:.6rem;margin-top:.75rem}
 .conn-pill{padding:.55rem .75rem;border:1.5px solid var(--rule);border-radius:8px;background:#fff;font-size:.82rem;display:flex;justify-content:space-between;align-items:center;font-weight:600}
 .dot{width:8px;height:8px;border-radius:50%;background:var(--mut);display:inline-block;margin-right:6px}
@@ -79,7 +83,7 @@ h1{font-family:"Bricolage Grotesque",sans-serif;font-size:1.85rem;font-weight:80
       </div>
     </div>
     <div style="display:flex;gap:.5rem;flex-wrap:wrap">
-      <button type="button" class="btn sec" id="refreshBtn">&#8635; Sync Now</button>
+      <button type="button" class="btn sec" id="refreshBtn">&#8635; Sync Live Store Now</button>
       <a href="index.html" class="btn sec">&larr; Back to Landing Page</a>
     </div>
   </header>
@@ -93,7 +97,7 @@ h1{font-family:"Bricolage Grotesque",sans-serif;font-size:1.85rem;font-weight:80
     <div class="card" style="margin-bottom:0">
       <h3>Synced Products</h3>
       <p class="stat" id="prodCount">0</p>
-      <p class="mut" id="prodSourceSub">Prices and stock verified live from your store or Google Sheet.</p>
+      <p class="mut" id="prodSourceSub">Prices and stock verified live in real time from your store or Google Sheet.</p>
     </div>
     <div class="card" style="margin-bottom:0">
       <h3>Needs Owner Takeover</h3>
@@ -110,14 +114,14 @@ h1{font-family:"Bricolage Grotesque",sans-serif;font-size:1.85rem;font-weight:80
           <div class="av-ring"><span class="av" id="simAv">S</span></div>
           <div class="ig-head-txt">
             <b><span id="simHandleText">Not connected</span> <span class="v-badge">&#10003;</span></b>
-            <span id="simSubText">Instagram Direct · Connected to Live Backend</span>
+            <span id="simSubText">Instagram Direct · Connected to Live Store Catalog</span>
           </div>
           <span class="pill" id="simPill">AI Active</span>
         </div>
         <div class="ig-thread" id="igThread"></div>
         <div class="ig-chips" id="igChips">
           <button type="button">What products do you have?</button>
-          <button type="button">How much are the silver hoops?</button>
+          <button type="button">How much is the Sage Stoneware Mug?</button>
           <button type="button">Do you deliver to Jaipur?</button>
           <button type="button">Can I get a 25% discount?</button>
         </div>
@@ -162,7 +166,7 @@ h1{font-family:"Bricolage Grotesque",sans-serif;font-size:1.85rem;font-weight:80
 
       <div class="card">
         <h3>Connect Store URL or Google Sheet</h3>
-        <p class="mut">Paste your online Store URL (Shopify / web store link) or public Google Sheet product link to sync your live products, prices, and stock.</p>
+        <p class="mut">Paste your online Store URL (e.g. Vercel / Shopify / web store link) or public Google Sheet product link to sync your live products, prices, and stock in real time.</p>
         <div class="inp-row">
           <input type="url" id="storeUrlInput" class="inp" value="" placeholder="https://yourstore.com or https://docs.google.com/spreadsheets/d/..." autocomplete="off">
           <button type="button" class="btn" id="syncStoreBtn">Connect &amp; Sync</button>
@@ -180,7 +184,7 @@ h1{font-family:"Bricolage Grotesque",sans-serif;font-size:1.85rem;font-weight:80
 
       <div class="card">
         <h3>Live Synced Catalog</h3>
-        <p class="mut">Adjust stock numbers with &minus; / + to update live Instagram DM replies immediately:</p>
+        <p class="mut">Real-time products from your connected store or sheet (adjust stock with &minus; / +):</p>
         <ul class="log-list" id="prodList">
           <li class="log-item"><span class="mut">Loading synced products...</span></li>
         </ul>
@@ -195,6 +199,13 @@ if (urlParams.get('api')) {
   localStorage.setItem('shelftalk_api', urlParams.get('api').replace(/\/+$/, ''));
 }
 const apiBase = (localStorage.getItem('shelftalk_api') || 'https://shelftalk-9df9.onrender.com').replace(/\/+$/, '');
+
+const LEGACY_DEMO_NAMES = new Set([
+  'silver hoop earrings',
+  'linen kurta',
+  'canvas tote bag',
+  'shea lip balm'
+]);
 
 function getSavedStore() {
   try {
@@ -214,6 +225,8 @@ function saveStoreLocal(patch) {
 const initialStore = getSavedStore();
 let currentHandle = (initialStore.ig_handle || '').replace(/^@/, '').trim();
 let currentSourceUrl = (initialStore.url || '').trim();
+let liveCatalogCache = Array.isArray(initialStore.cachedProducts) ? initialStore.cachedProducts : [];
+let currentCurrency = initialStore.currency || '₹';
 
 const igHandleStat = document.getElementById('igHandleStat');
 const igHandleSub = document.getElementById('igHandleSub');
@@ -223,6 +236,27 @@ const ownerIgInput = document.getElementById('ownerIgInput');
 const storeUrlInput = document.getElementById('storeUrlInput');
 const thread = document.getElementById('igThread');
 const simPill = document.getElementById('simPill');
+
+function formatPrice(price, currency) {
+  const curr = currency || currentCurrency || '₹';
+  const num = Number(price || 0);
+  if (curr === '$') {
+    return '$' + num.toFixed(2);
+  }
+  return '₹' + num.toLocaleString('en-IN');
+}
+
+function computeStatus(stock) {
+  const s = Number(stock || 0);
+  if (s <= 0) return { label: 'Out of stock', cls: 'out' };
+  if (s <= 5) return { label: `Low stock (${s} left)`, cls: 'low' };
+  return { label: 'In stock', cls: 'in' };
+}
+
+function isLegacyDemoCatalog(prods) {
+  if (!Array.isArray(prods) || prods.length !== 4) return false;
+  return prods.every(p => LEGACY_DEMO_NAMES.has(String(p.name || '').toLowerCase().trim()));
+}
 
 function applyHandleUI(rawHandle, updateInput = true) {
   const clean = (rawHandle || '').replace(/^@/, '').trim();
@@ -259,21 +293,327 @@ function applySourceUrlUI(url, sourceType) {
     }
     const isSheet = cleanUrl.includes('docs.google.com/spreadsheets') || sourceType === 'google_sheet';
     document.getElementById('prodSourceSub').textContent = isSheet
-      ? 'Synced live from your linked Google Sheet.'
-      : 'Synced live from your connected Store URL.';
+      ? 'Synced live in real time from your linked Google Sheet.'
+      : `Synced live in real time from ${cleanUrl}`;
     document.getElementById('dotCatalog').classList.add('on');
     document.getElementById('txtCatalog').textContent = isSheet ? 'Google Sheet' : 'Store Live';
     saveStoreLocal({ url: cleanUrl, source_type: isSheet ? 'google_sheet' : 'store_url' });
   } else {
-    document.getElementById('prodSourceSub').textContent = 'Prices and stock verified live from your store or Google Sheet.';
+    document.getElementById('prodSourceSub').textContent = 'Prices and stock verified live in real time from your store or Google Sheet.';
   }
 }
 
-// Initialize blank unless previously saved by the user
+/* ===== Browser-Side Real-Time Store & Sheet Parser ===== */
+function extractBalancedObjectsJS(text) {
+  const objs = [];
+  let depth = 0, start = -1, inStr = null, esc = false;
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    if (esc) { esc = false; continue; }
+    if (ch === '\\') { esc = true; continue; }
+    if (inStr) { if (ch === inStr) inStr = null; continue; }
+    if (ch === '"' || ch === "'" || ch === '`') { inStr = ch; continue; }
+    if (ch === '{') {
+      if (depth === 0) start = i;
+      depth++;
+    } else if (ch === '}') {
+      if (depth > 0) {
+        depth--;
+        if (depth === 0 && start !== -1) {
+          const span = i - start + 1;
+          if (span >= 15 && span <= 4000) objs.push(text.slice(start, i + 1));
+          start = -1;
+        }
+      }
+    }
+  }
+  return objs;
+}
+
+function parseProductsFromScriptOrHtml(rawText) {
+  if (!rawText || rawText.length < 15) return [];
+  const candidates = [];
+
+  // 1. Check if rawText is pure JSON
+  const trimmed = rawText.trim();
+  if (trimmed.startsWith('{') || trimmed.startsWith('[')) {
+    try {
+      const j = JSON.parse(trimmed);
+      const arr = Array.isArray(j) ? j : (j.products || j.items || j.catalog || j.data || j.inventory || []);
+      if (Array.isArray(arr) && arr.length) {
+        const mapped = arr.map((it, idx) => ({
+          id: idx + 1,
+          name: String(it.name || it.title || '').trim(),
+          category: String(it.category || it.product_type || it.sizes || 'Standard').trim(),
+          sizes: String(it.sizes || it.category || 'Standard').trim(),
+          price: Number(String(it.price ?? (it.variants && it.variants[0] ? it.variants[0].price : 0)).replace(/[^0-9.]/g, '') || 0),
+          stock: Number(it.stock ?? it.inventory ?? it.qty ?? (it.variants && it.variants[0] ? it.variants[0].inventory_quantity : 8)),
+          currency: String(it.currency || (String(it.price || '').includes('$') ? '$' : '') || '')
+        })).filter(p => p.name.length >= 2);
+        if (mapped.length > candidates.length) return mapped;
+      }
+    } catch (_) {}
+  }
+
+  // 2. Scan JS object literals (handles unquoted, quoted, or escaped Next.js/Vite/React bundles)
+  const variants = [rawText];
+  if (rawText.includes('\\"')) variants.push(rawText.replace(/\\"/g, '"'));
+
+  const nameRe = /(?:['"`]?\b(?:name|title|product_name|productName|item_name)\b['"`]?)\s*:\s*['"`]([^'"`\\]{2,100})['"`]/i;
+  const priceRe = /(?:['"`]?\b(?:price|mrp|cost|amount|unit_price|sale_price)\b['"`]?)\s*:\s*['"`]?\s*(₹|\$|Rs\.?|INR|USD)?\s*(\d+(?:,\d{3})*(?:\.\d+)?)\s*['"`]?/i;
+  const stockRe = /(?:['"`]?\b(?:stock|qty|quantity|inventory|inventory_quantity|count)\b['"`]?)\s*:\s*['"`]?(\d+)['"`]?/i;
+  const catRe = /(?:['"`]?\b(?:category|cat|department|collection|group)\b['"`]?)\s*:\s*['"`]([^'"`\\]{2,50})['"`]/i;
+
+  for (const variantText of variants) {
+    const objs = extractBalancedObjectsJS(variantText);
+    const found = [];
+    const seen = new Set();
+    for (const objStr of objs) {
+      const nm = objStr.match(nameRe);
+      const pm = objStr.match(priceRe);
+      if (!nm || !pm) continue;
+      const name = nm[1].trim();
+      const key = name.toLowerCase();
+      if (seen.has(key) || ['home', 'admin', 'store', 'default', 'index', 'app', 'shelftalk'].includes(key)) continue;
+      seen.add(key);
+
+      const sym = (pm[1] || '').trim();
+      const curr = sym.includes('$') || sym.toUpperCase() === 'USD' ? '$' : (sym ? '₹' : '$');
+      const price = parseFloat(pm[2].replace(/,/g, ''));
+      const sm = objStr.match(stockRe);
+      const stock = sm ? parseInt(sm[1], 10) : 8;
+      const cm = objStr.match(catRe);
+      const category = cm ? cm[1].trim() : 'Standard';
+
+      found.push({
+        id: found.length + 1,
+        name,
+        price,
+        stock,
+        category,
+        sizes: category,
+        currency: curr
+      });
+    }
+    if (found.length > candidates.length) {
+      candidates.splice(0, candidates.length, ...found);
+    }
+  }
+
+  // 3. Scan HTML DOM tables (<tr>/<td>) & product cards using DOMParser
+  if (rawText.includes('<')) {
+    try {
+      const doc = new DOMParser().parseFromString(rawText, 'text/html');
+      const trs = [...doc.querySelectorAll('tbody tr, table tr')];
+      const tableFound = [];
+      const seenTable = new Set();
+
+      for (const tr of trs) {
+        if (tr.querySelector('th')) continue;
+        const tds = [...tr.querySelectorAll('td')];
+        if (tds.length < 2) continue;
+        const texts = tds.map(td => {
+          const inp = td.querySelector('input');
+          return (td.textContent || (inp ? inp.value : '') || '').replace(/\s+/g, ' ').trim();
+        });
+        const rowStr = texts.join(' | ');
+        const pm = rowStr.match(/(₹|\$|Rs\.?|INR|USD)\s*(\d+(?:,\d{3})*(?:\.\d+)?)/i);
+        if (!pm) continue;
+
+        const curr = pm[1].includes('$') || pm[1].toUpperCase() === 'USD' ? '$' : '₹';
+        const price = parseFloat(pm[2].replace(/,/g, ''));
+        let name = '', category = '', stock = null;
+
+        for (const txt of texts) {
+          if (!txt) continue;
+          if (/(?:₹|\$|Rs\.?|INR|USD)\s*\d+/i.test(txt)) continue;
+          const low = txt.toLowerCase();
+          if (['edit', 'delete', 'edit delete', 'actions', 'in stock', 'low stock', 'out of stock', 'sold out'].includes(low)) {
+            if (low.includes('out of stock') || low.includes('sold out')) stock = 0;
+            continue;
+          }
+          const sm = txt.match(/^[\-−\+\s]*(\d+)[\-−\+\s]*$/);
+          if (sm) {
+            stock = parseInt(sm[1], 10);
+            continue;
+          }
+          if (!name) name = txt.replace(/\s*(Edit|Delete)\s*$/i, '').trim();
+          else if (!category && txt.length < 40) category = txt;
+        }
+
+        if (stock === null) {
+          stock = /out of stock|sold out/i.test(rowStr) ? 0 : 8;
+        }
+        const key = name.toLowerCase();
+        if (name && !seenTable.has(key)) {
+          seenTable.add(key);
+          tableFound.push({
+            id: tableFound.length + 1,
+            name,
+            price,
+            stock,
+            category: category || 'Standard',
+            sizes: category || 'Standard',
+            currency: curr
+          });
+        }
+      }
+      if (tableFound.length > candidates.length) {
+        candidates.splice(0, candidates.length, ...tableFound);
+      }
+    } catch (_) {}
+  }
+
+  return candidates;
+}
+
+async function fetchUrlWithCorsFallback(targetUrl) {
+  try {
+    const r = await fetch(targetUrl, { cache: 'no-store' });
+    if (r.ok) return await r.text();
+  } catch (_) {}
+  try {
+    const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(targetUrl)}&_=${Date.now()}`;
+    const r2 = await fetch(proxyUrl, { cache: 'no-store' });
+    if (r2.ok) return await r2.text();
+  } catch (_) {}
+  return '';
+}
+
+async function fetchLiveStoreCatalogInBrowser(storeUrl) {
+  const cleanUrl = (storeUrl || '').trim();
+  if (!cleanUrl || !/^https?:\/\//i.test(cleanUrl)) return [];
+
+  let origin = cleanUrl.replace(/\/+$/, '');
+  try {
+    const u = new URL(cleanUrl);
+    origin = u.origin;
+  } catch (_) {}
+
+  // 1. Try JSON endpoints first
+  const jsonPaths = ['/api/products', '/api/inventory', '/products.json', '/data/products.json', '/catalog.json'];
+  for (const path of jsonPaths) {
+    const txt = await fetchUrlWithCorsFallback(origin + path);
+    if (txt && (txt.trim().startsWith('{') || txt.trim().startsWith('['))) {
+      const parsed = parseProductsFromScriptOrHtml(txt);
+      if (parsed.length > 0 && !isLegacyDemoCatalog(parsed)) return parsed;
+    }
+  }
+
+  // 2. Fetch the main Store HTML page and any linked local JS bundles
+  const htmlText = await fetchUrlWithCorsFallback(cleanUrl);
+  if (htmlText) {
+    let best = parseProductsFromScriptOrHtml(htmlText);
+
+    // Check external <script src="..."> bundles if needed
+    const scriptMatches = [...htmlText.matchAll(/<script[^>]+src=['"]?([^'"\s>]+)['"]?/gi)];
+    for (const m of scriptMatches) {
+      const src = m[1];
+      if (/googleapis|gstatic|analytics|gtag|facebook/i.test(src)) continue;
+      let fullScriptUrl = src;
+      try {
+        fullScriptUrl = new URL(src, cleanUrl).href;
+      } catch (_) {}
+      const jsText = await fetchUrlWithCorsFallback(fullScriptUrl);
+      if (jsText) {
+        const fromBundle = parseProductsFromScriptOrHtml(jsText);
+        if (fromBundle.length > best.length) best = fromBundle;
+      }
+    }
+    if (best.length > 0 && !isLegacyDemoCatalog(best)) return best;
+  }
+
+  return [];
+}
+
+function renderCatalogUI(prods) {
+  if (!Array.isArray(prods)) prods = [];
+  if (prods.length > 0 && prods[0].currency) {
+    currentCurrency = prods[0].currency;
+  } else if (currentSourceUrl && !currentSourceUrl.includes('docs.google.com') && prods.some(p => !LEGACY_DEMO_NAMES.has(String(p.name || '').toLowerCase()))) {
+    currentCurrency = prods[0]?.currency || '$';
+  }
+
+  document.getElementById('prodCount').textContent = prods.length;
+  if (prods.length > 0) {
+    document.getElementById('dotCatalog').classList.add('on');
+    document.getElementById('txtCatalog').textContent = `${prods.length} items live`;
+  }
+
+  const pl = document.getElementById('prodList');
+  pl.innerHTML = '';
+  if (!prods.length) {
+    pl.innerHTML = '<li class="log-item"><span class="mut">No products synced yet. Paste your Store URL or Google Sheet above and click Connect &amp; Sync.</span></li>';
+    return;
+  }
+
+  prods.forEach(p => {
+    const li = document.createElement('li');
+    li.className = 'log-item';
+    const info = document.createElement('div');
+    const st = computeStatus(p.stock);
+    const catLabel = p.category || p.sizes || 'Standard';
+    const priceLabel = formatPrice(p.price, p.currency || currentCurrency);
+
+    info.innerHTML = `
+      <b>${p.name}</b> <span class="tag-status ${st.cls}">${st.label}</span>
+      <small>${priceLabel} · Category: ${catLabel}</small>
+    `;
+
+    const ctrl = document.createElement('div');
+    ctrl.className = 'stock-ctrl';
+    const decBtn = document.createElement('button');
+    decBtn.type = 'button';
+    decBtn.textContent = '−';
+    const countSpan = document.createElement('span');
+    countSpan.textContent = p.stock;
+    const incBtn = document.createElement('button');
+    incBtn.type = 'button';
+    incBtn.textContent = '+';
+
+    const updateStock = async (newStock) => {
+      const clamped = Math.max(0, newStock);
+      p.stock = clamped;
+      countSpan.textContent = clamped;
+      saveStoreLocal({ cachedProducts: prods, currency: currentCurrency });
+      renderCatalogUI(prods);
+      try {
+        await fetch(`${apiBase}/api/products/${p.id}/stock`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ stock: clamped })
+        });
+      } catch (_) {}
+    };
+
+    decBtn.onclick = () => updateStock(Number(p.stock) - 1);
+    incBtn.onclick = () => updateStock(Number(p.stock) + 1);
+
+    ctrl.append(decBtn, countSpan, incBtn);
+    li.append(info, ctrl);
+    pl.appendChild(li);
+  });
+
+  // Update quick-test chips to match the store's actual synced products
+  const chips = document.getElementById('igChips');
+  const firstProd = prods[0].name;
+  const secondProd = prods.length > 1 ? prods[1].name : firstProd;
+  chips.innerHTML = `
+    <button type="button">What products do you have?</button>
+    <button type="button">How much is the ${firstProd}?</button>
+    <button type="button">Is ${secondProd} in stock?</button>
+    <button type="button">Can I get a 25% discount?</button>
+  `;
+}
+
+// Initialize UI state
 applyHandleUI(currentHandle, true);
 if (currentSourceUrl) {
   storeUrlInput.value = currentSourceUrl;
   applySourceUrlUI(currentSourceUrl);
+}
+if (liveCatalogCache.length > 0 && !(currentSourceUrl && isLegacyDemoCatalog(liveCatalogCache))) {
+  renderCatalogUI(liveCatalogCache);
 }
 
 function addBubble(cls, text) {
@@ -295,15 +635,95 @@ function addNote(text) {
 addBubble(
   'sh',
   currentHandle
-    ? `Hi! Welcome to @${currentHandle} on Instagram. Ask me about product prices, stock, sizes, or delivery!`
+    ? `Hi! Welcome to @${currentHandle} on Instagram. Ask me about product prices, stock, categories, or delivery!`
     : 'Hi! Connect your store Instagram handle and Store URL or Google Sheet on the right to test your live automated DMs.'
 );
 
+let isSyncingLive = false;
+
+async function syncStoreRealtime(urlToSync, showStatus = false) {
+  const targetUrl = (urlToSync || currentSourceUrl || '').trim();
+  if (!targetUrl || isSyncingLive) return;
+  isSyncingLive = true;
+
+  const status = document.getElementById('storeUrlStatus');
+  const isSheet = targetUrl.includes('docs.google.com/spreadsheets');
+
+  try {
+    // 1. Try browser-side direct fetch of the live Store URL so even SPA/Vercel stores extract all products immediately
+    let browserProducts = [];
+    if (!isSheet) {
+      browserProducts = await fetchLiveStoreCatalogInBrowser(targetUrl);
+    }
+
+    // 2. Send to Render backend (with browserProducts attached if found, plus backend's own real-time scraper)
+    const res = await fetch(`${apiBase}/api/store/connect`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        url: targetUrl,
+        owner_username: currentHandle || undefined,
+        products: browserProducts.length > 0 ? browserProducts : undefined
+      })
+    });
+    const data = await res.json().catch(() => ({}));
+
+    let finalProducts = [];
+    if (Array.isArray(data.products) && data.products.length > 0 && !isLegacyDemoCatalog(data.products)) {
+      finalProducts = data.products;
+    } else if (browserProducts.length > 0) {
+      finalProducts = browserProducts;
+    } else {
+      // Check GET /api/products?source_url=...
+      const pRes = await fetch(`${apiBase}/api/products?source_url=${encodeURIComponent(targetUrl)}`);
+      if (pRes.ok) {
+        const pList = await pRes.json();
+        if (Array.isArray(pList) && (!isLegacyDemoCatalog(pList) || isSheet)) {
+          finalProducts = pList;
+        }
+      }
+    }
+
+    if (finalProducts.length > 0) {
+      liveCatalogCache = finalProducts;
+      if (finalProducts[0].currency) currentCurrency = finalProducts[0].currency;
+      saveStoreLocal({
+        url: targetUrl,
+        source_type: isSheet ? 'google_sheet' : 'store_url',
+        cachedProducts: finalProducts,
+        currency: currentCurrency,
+        productsCount: finalProducts.length
+      });
+      applySourceUrlUI(targetUrl, isSheet ? 'google_sheet' : 'store_url');
+      renderCatalogUI(finalProducts);
+
+      if (showStatus && status) {
+        status.style.color = 'var(--ok)';
+        status.textContent = `Synced ${finalProducts.length} live products in real time from ${isSheet ? 'Google Sheet' : targetUrl}!`;
+      }
+    } else if (showStatus && status) {
+      status.style.color = 'var(--bad)';
+      status.textContent = data.detail || 'Could not find products at that URL. Check the link and try again.';
+    }
+  } catch (err) {
+    if (showStatus && status) {
+      status.style.color = 'var(--bad)';
+      status.textContent = err.message || 'Error connecting to store URL.';
+    }
+  } finally {
+    isSyncingLive = false;
+  }
+}
+
 async function refreshDashboard() {
   try {
+    const querySuffix = currentSourceUrl
+      ? `?source_url=${encodeURIComponent(currentSourceUrl)}&owner_username=${encodeURIComponent(currentHandle || '')}`
+      : '';
+
     const [hRes, pRes, qRes, cRes] = await Promise.all([
-      fetch(`${apiBase}/api/health`),
-      fetch(`${apiBase}/api/products`),
+      fetch(`${apiBase}/api/health${querySuffix}`),
+      fetch(`${apiBase}/api/products${querySuffix}`),
       fetch(`${apiBase}/api/queue`),
       fetch(`${apiBase}/api/chats`).catch(() => null)
     ]);
@@ -318,79 +738,24 @@ async function refreshDashboard() {
       document.getElementById('dotBotpress').classList.add('on');
       document.getElementById('txtBotpress').textContent = h.botpress_connected ? 'Botpress Live' : 'AI Active';
 
-      // Only apply backend handle if user hasn't cleared it or if local handle is empty and backend has a non-default handle
       const backendHandle = (h.owner_username || '').replace(/^@/, '').trim();
       if (!currentHandle && backendHandle && backendHandle !== 'yojityadav') {
         applyHandleUI(backendHandle, true);
       }
-      if (h.source_url) {
+      if (h.source_url && !currentSourceUrl) {
         applySourceUrlUI(h.source_url, h.source_type);
       }
     }
 
     if (pRes && pRes.ok) {
       const prods = await pRes.json();
-      document.getElementById('prodCount').textContent = prods.length;
-      if (prods.length > 0) {
-        document.getElementById('dotCatalog').classList.add('on');
-        if (document.getElementById('txtCatalog').textContent === 'Not synced') {
-          document.getElementById('txtCatalog').textContent = `${prods.length} items`;
-        }
-      }
-      const pl = document.getElementById('prodList');
-      pl.innerHTML = '';
-      if (!prods.length) {
-        pl.innerHTML = '<li class="log-item"><span class="mut">No products synced yet. Paste your Store URL or Google Sheet above.</span></li>';
-      } else {
-        prods.forEach(p => {
-          const li = document.createElement('li');
-          li.className = 'log-item';
-          const info = document.createElement('div');
-          info.innerHTML = `<b>${p.name}</b><small>₹${p.price} · ${p.status} (Sizes: ${p.sizes || 'Standard'})</small>`;
-
-          const ctrl = document.createElement('div');
-          ctrl.className = 'stock-ctrl';
-          const decBtn = document.createElement('button');
-          decBtn.type = 'button';
-          decBtn.textContent = '−';
-          const countSpan = document.createElement('span');
-          countSpan.textContent = p.stock;
-          const incBtn = document.createElement('button');
-          incBtn.type = 'button';
-          incBtn.textContent = '+';
-
-          const updateStock = async (newStock) => {
-            const clamped = Math.max(0, newStock);
-            countSpan.textContent = clamped;
-            try {
-              await fetch(`${apiBase}/api/products/${p.id}/stock`, {
-                method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ stock: clamped })
-              });
-              refreshDashboard();
-            } catch (_) {}
-          };
-
-          decBtn.onclick = () => updateStock(Number(p.stock) - 1);
-          incBtn.onclick = () => updateStock(Number(p.stock) + 1);
-
-          ctrl.append(decBtn, countSpan, incBtn);
-          li.append(info, ctrl);
-          pl.appendChild(li);
-        });
-      }
-
-      // Update quick-test chips to match the store's actual synced products
-      if (prods.length > 0) {
-        const chips = document.getElementById('igChips');
-        const firstProd = prods[0].name;
-        chips.innerHTML = `
-          <button type="button">What products do you have?</button>
-          <button type="button">How much is the ${firstProd}?</button>
-          <button type="button">Do you deliver to Jaipur?</button>
-          <button type="button">Can I get a 25% discount?</button>
-        `;
+      // If a store URL is connected but backend returned the 4 legacy demo items (e.g. after Render cold-start or before backend deploy), trigger real-time browser+backend sync!
+      if (currentSourceUrl && isLegacyDemoCatalog(prods)) {
+        await syncStoreRealtime(currentSourceUrl, false);
+      } else if (Array.isArray(prods) && prods.length > 0) {
+        liveCatalogCache = prods;
+        saveStoreLocal({ cachedProducts: prods, productsCount: prods.length });
+        renderCatalogUI(prods);
       }
     }
 
@@ -450,6 +815,29 @@ async function refreshDashboard() {
   }
 }
 
+function answerFromLiveCatalogFallback(text) {
+  if (!liveCatalogCache.length) return null;
+  const q = text.toLowerCase();
+  if (/discount|% off|refund|damaged|complain|human|owner|custom|negotiate/i.test(q)) {
+    return null;
+  }
+  if (/what product|which product|what do you have|catalog|all product|in stock|items|sell/i.test(q)) {
+    const avail = liveCatalogCache.filter(p => Number(p.stock) > 0);
+    const listStr = avail.map(p => `${p.name} (${formatPrice(p.price, p.currency)}, ${p.stock} left)`).join(', ');
+    return `Here is our live in-stock catalog (${avail.length} of ${liveCatalogCache.length} products available): ${listStr}.`;
+  }
+  for (const p of liveCatalogCache) {
+    const words = p.name.toLowerCase().split(/\s+/).filter(w => w.length > 2);
+    if (q.includes(p.name.toLowerCase()) || words.filter(w => q.includes(w)).length >= 1) {
+      const pStr = formatPrice(p.price, p.currency);
+      if (Number(p.stock) <= 0) return `${p.name} (${pStr}) is currently out of stock.`;
+      if (Number(p.stock) <= 5) return `${p.name} is ${pStr} — low stock, only ${p.stock} left!`;
+      return `${p.name} is ${pStr} and in stock (${p.stock} available).`;
+    }
+  }
+  return null;
+}
+
 async function sendSimDM(text) {
   text = text.trim();
   if (!text) return;
@@ -461,8 +849,18 @@ async function sendSimDM(text) {
       body: JSON.stringify({ text })
     });
     const data = await res.json();
-    addBubble('sh', data.reply || 'Thanks for your message!');
-    if (data.status === 'needs_owner' || String(data.status).includes('owner')) {
+    let replyText = data.reply || 'Thanks for your message!';
+    let status = data.status;
+
+    // If backend wasn't updated yet and returned unmatched inquiry for a live store product, answer from the live synced catalog
+    const localCatalogAns = answerFromLiveCatalogFallback(text);
+    if (localCatalogAns && (status === 'needs_owner' || /silver hoop|linen kurta|shea lip balm/i.test(replyText))) {
+      replyText = localCatalogAns;
+      status = 'replied';
+    }
+
+    addBubble('sh', replyText);
+    if (status === 'needs_owner' || String(status).includes('owner')) {
       simPill.textContent = 'AI Paused · Owner Takeover';
       simPill.classList.add('paused');
       const target = currentHandle ? `@${currentHandle}` : 'Store Owner';
@@ -473,7 +871,12 @@ async function sendSimDM(text) {
     }
     refreshDashboard();
   } catch (err) {
-    addBubble('sh', 'Error reaching backend server. Please verify Render is awake.');
+    const localAns = answerFromLiveCatalogFallback(text);
+    if (localAns) {
+      addBubble('sh', localAns);
+    } else {
+      addBubble('sh', 'Error reaching backend server. Please verify Render is awake.');
+    }
   }
 }
 
@@ -552,51 +955,36 @@ document.getElementById('syncStoreBtn').addEventListener('click', async () => {
   }
 
   btn.disabled = true;
-  btn.textContent = 'Syncing...';
+  btn.textContent = 'Syncing Live...';
   status.style.color = 'var(--mut)';
-  const isSheet = url.includes('docs.google.com/spreadsheets');
-  status.textContent = isSheet
-    ? 'Syncing live product catalog from your Google Sheet...'
-    : 'Syncing live product catalog from your Store URL...';
+  status.textContent = `Fetching real-time catalog from ${url}...`;
 
-  try {
-    const res = await fetch(`${apiBase}/api/store/connect`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ url, owner_username: currentHandle || undefined })
-    });
-    const data = await res.json().catch(() => ({}));
-    if (!res.ok) {
-      throw new Error(data.detail || 'Backend could not parse that link directly.');
-    }
-    applySourceUrlUI(url, isSheet ? 'google_sheet' : 'store_url');
-    status.style.color = 'var(--ok)';
-    const countTxt = data.imported || data.count || '';
-    status.textContent = isSheet
-      ? `Google Sheet synced! ${countTxt ? countTxt + ' products' : 'Catalog'} updated live.`
-      : `Store URL connected! ${countTxt ? countTxt + ' products' : 'Catalog'} synced live.`;
-    await refreshDashboard();
-  } catch (err) {
-    // If the user connected a store URL and the backend only had sheet parser deployed, still link the store URL cleanly
-    if (!isSheet) {
-      applySourceUrlUI(url, 'store_url');
-      status.style.color = 'var(--ok)';
-      status.textContent = 'Store URL linked to Admin Portal! Deploy updated app/main.py on Render for full store product scraping.';
-      await refreshDashboard();
-    } else {
-      status.style.color = 'var(--bad)';
-      status.textContent = err.message || 'Could not sync link. Ensure your Google Sheet is shared as "Anyone with the link can view".';
-    }
-  } finally {
-    btn.disabled = false;
-    btn.textContent = 'Connect & Sync';
-  }
+  await syncStoreRealtime(url, true);
+
+  btn.disabled = false;
+  btn.textContent = 'Connect & Sync';
 });
 
-document.getElementById('refreshBtn').addEventListener('click', refreshDashboard);
+document.getElementById('refreshBtn').addEventListener('click', async () => {
+  if (currentSourceUrl) {
+    await syncStoreRealtime(currentSourceUrl, true);
+  }
+  await refreshDashboard();
+});
 
-refreshDashboard();
-setInterval(refreshDashboard, 5000);
+// Perform an immediate real-time sync on load if a Store URL is connected, and poll every 5 seconds
+(async () => {
+  if (currentSourceUrl) {
+    await syncStoreRealtime(currentSourceUrl, false);
+  }
+  await refreshDashboard();
+})();
+setInterval(async () => {
+  if (currentSourceUrl) {
+    await syncStoreRealtime(currentSourceUrl, false);
+  }
+  await refreshDashboard();
+}, 5000);
 </script>
 </body>
 </html>

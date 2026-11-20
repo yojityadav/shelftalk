@@ -8,6 +8,7 @@ import json
 import os
 import re
 import sqlite3
+import time
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -26,6 +27,39 @@ from pydantic import BaseModel, Field
 
 from . import brain, db, store
 
+SETTINGS_FILE = os.path.join(os.path.dirname(__file__), "store_settings.json")
+
+
+def _load_persisted_settings() -> dict:
+    default = {
+        "owner_username": "",
+        "source_url": "",
+        "source_type": "",
+        "currency": "₹",
+        "last_sync_ts": 0.0,
+    }
+    try:
+        if os.path.exists(SETTINGS_FILE):
+            with open(SETTINGS_FILE, "r", encoding="utf-8") as f:
+                data = json.load(f)
+                if isinstance(data, dict):
+                    default.update(data)
+    except Exception:
+        pass
+    return default
+
+
+def _save_persisted_settings():
+    try:
+        with open(SETTINGS_FILE, "w", encoding="utf-8") as f:
+            json.dump(STORE_SETTINGS, f)
+    except Exception:
+        pass
+
+
+STORE_SETTINGS = _load_persisted_settings()
+VERIFY_TOKEN = os.getenv("INSTAGRAM_VERIFY_TOKEN", "shelftalk_verify_2026")
+
 
 def _patch_store_and_db_limits():
     """Removes any hardcoded 4-product slice/limit (e.g. [:4] or LIMIT 4) inside app/store.py and app/db.py."""
@@ -35,25 +69,20 @@ def _patch_store_and_db_limits():
                 if isinstance(attr_val, int) and attr_val == 4 and any(
                     k in attr_name.lower() for k in ("max", "limit", "count", "cap", "top")
                 ):
-                    setattr(mod, attr_name, 100)
+                    setattr(mod, attr_name, 200)
 
             src = inspect.getsource(mod)
             patched = src
-            # Replace [:4] slices with [:100]
-            patched = re.sub(r"\[\s*:\s*4\s*\]", "[:100]", patched)
-            # Replace len(...) >= 4 or == 4 loop caps with 100
-            patched = re.sub(r"(len\([^)]+\)\s*(?:>=|==|>)\s*)4\b", r"\g<1>100", patched)
-            # Replace SQL LIMIT 4 with LIMIT 100
-            patched = re.sub(r"\bLIMIT\s+4\b", "LIMIT 100", patched, flags=re.IGNORECASE)
-            # Replace range(4) or min(..., 4) product caps
-            patched = re.sub(r"\brange\(\s*4\s*\)", "range(100)", patched)
+            patched = re.sub(r"\[\s*:\s*4\s*\]", "[:200]", patched)
+            patched = re.sub(r"(len\([^)]+\)\s*(?:>=|==|>)\s*)4\b", r"\g<1>200", patched)
+            patched = re.sub(r"\bLIMIT\s+4\b", "LIMIT 200", patched, flags=re.IGNORECASE)
+            patched = re.sub(r"\brange\(\s*4\s*\)", "range(200)", patched)
 
             if patched != src and getattr(mod, "__file__", None):
                 code_obj = compile(patched, mod.__file__, "exec")
                 exec(code_obj, mod.__dict__)
-                print(f"Patched 4-item limit to 100 in {mod.__name__}")
-        except Exception as e:
-            print(f"Notice while inspecting {getattr(mod, '__name__', 'module')}: {e}")
+        except Exception:
+            pass
 
 
 _patch_store_and_db_limits()
@@ -68,8 +97,8 @@ def _now_iso() -> str:
     return datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
-def _make_aliases(name: str) -> str:
-    words = [w.lower() for w in re.findall(r"[a-zA-Z0-9]+", name) if len(w) > 2]
+def _make_aliases(name: str, category: str = "") -> str:
+    words = [w.lower() for w in re.findall(r"[a-zA-Z0-9]+", f"{name} {category}") if len(w) > 2]
     return ",".join(dict.fromkeys(words))
 
 
@@ -86,10 +115,17 @@ def _normalize_product_list(items: list[dict]) -> list[dict]:
         seen.add(key)
 
         raw_price = item.get("price", 0)
+        currency = item.get("currency") or ""
         if isinstance(raw_price, str):
+            if "$" in raw_price or "USD" in raw_price.upper():
+                currency = "$"
+            elif "₹" in raw_price or "INR" in raw_price.upper() or "RS" in raw_price.upper():
+                currency = "₹"
             m = re.search(r"\d+(?:,\d{3})*(?:\.\d+)?", raw_price)
-            raw_price = float(m.group(0).replace(",", "")) if m else 0
-        price = int(round(float(raw_price or 0)))
+            raw_price = float(m.group(0).replace(",", "")) if m else 0.0
+
+        price_float = float(raw_price or 0)
+        price = int(price_float) if price_float.is_integer() else round(price_float, 2)
 
         raw_stock = item.get("stock", 8)
         try:
@@ -97,9 +133,13 @@ def _normalize_product_list(items: list[dict]) -> list[dict]:
         except Exception:
             stock = 8
 
-        sizes = str(item.get("sizes") or "Standard").strip() or "Standard"
-        aliases = str(item.get("aliases") or _make_aliases(name)).strip()
+        category = str(item.get("category") or "").strip()
+        sizes = str(item.get("sizes") or category or "Standard").strip() or "Standard"
+        aliases = str(item.get("aliases") or _make_aliases(name, category)).strip()
         updated_at = str(item.get("updated_at") or _now_iso())
+
+        if currency in ("$", "₹"):
+            STORE_SETTINGS["currency"] = currency
 
         normalized.append({
             "id": idx,
@@ -107,111 +147,106 @@ def _normalize_product_list(items: list[dict]) -> list[dict]:
             "price": price,
             "stock": stock,
             "sizes": sizes,
+            "category": category or sizes,
+            "currency": currency or STORE_SETTINGS.get("currency", "₹"),
             "aliases": aliases,
             "updated_at": updated_at,
         })
     return normalized
 
 
-def _persist_products_to_db(items: list[dict]) -> list[dict]:
-    """Saves all imported products into db (via db functions, SQLite table, and runtime hooks)."""
+def _install_catalog_hooks(normalized: list[dict]):
+    """Ensures db.list_products(), db.get_product(), db.set_stock() and brain always see the full live catalog."""
     global _CUSTOM_CATALOG
+    _CUSTOM_CATALOG = [dict(p) for p in normalized]
+
+    def _custom_list_products():
+        return [dict(p) for p in _CUSTOM_CATALOG]
+
+    def _custom_get_product(pid: int):
+        for p in _CUSTOM_CATALOG:
+            if int(p["id"]) == int(pid):
+                return dict(p)
+        return None
+
+    def _custom_set_stock(pid: int, stock: int):
+        for p in _CUSTOM_CATALOG:
+            if int(p["id"]) == int(pid):
+                p["stock"] = max(0, int(stock))
+                p["updated_at"] = _now_iso()
+                _sync_sqlite_table(_CUSTOM_CATALOG)
+                return dict(p)
+        return None
+
+    db.list_products = _custom_list_products
+    db.get_product = _custom_get_product
+    db.set_stock = _custom_set_stock
+
+    # If brain or store imported list_products directly, update their reference too
+    for mod in (brain, store):
+        if hasattr(mod, "list_products"):
+            setattr(mod, "list_products", _custom_list_products)
+        if hasattr(mod, "get_product"):
+            setattr(mod, "get_product", _custom_get_product)
+
+
+def _sync_sqlite_table(normalized: list[dict]):
+    """Best-effort write of all products into db's SQLite table or in-memory list."""
+    # 1. Check if db has an in-memory list of products
+    for attr_name, attr_val in list(vars(db).items()):
+        if isinstance(attr_val, list) and attr_val and isinstance(attr_val[0], dict) and "name" in attr_val[0] and "stock" in attr_val[0]:
+            attr_val[:] = [dict(p) for p in normalized]
+
+    # 2. Check if db has a SQLite file path
+    db_path = None
+    for path_attr in ("DB_PATH", "DB_FILE", "PATH", "DB", "DATABASE"):
+        val = getattr(db, path_attr, None)
+        if isinstance(val, (str, os.PathLike)) and os.path.exists(str(val)):
+            db_path = str(val)
+            break
+
+    if not db_path:
+        try:
+            src = inspect.getsource(db)
+            m = re.search(r"([a-zA-Z0-9_\-/]+\.db)", src)
+            if m and os.path.exists(m.group(1)):
+                db_path = m.group(1)
+        except Exception:
+            pass
+
+    if db_path:
+        try:
+            with sqlite3.connect(db_path, timeout=5) as conn:
+                cur = conn.cursor()
+                tables = [r[0] for r in cur.execute("SELECT name FROM sqlite_master WHERE type='table'").fetchall()]
+                if "products" in tables:
+                    cols_info = cur.execute("PRAGMA table_info(products)").fetchall()
+                    col_names = [c[1] for c in cols_info]
+                    cur.execute("DELETE FROM products")
+                    for p in normalized:
+                        row_vals = []
+                        for c in col_names:
+                            if c in p:
+                                row_vals.append(p[c])
+                            elif c == "status":
+                                s = p["stock"]
+                                row_vals.append("Sold out" if s == 0 else f"Only {s} left" if s <= 5 else "In stock")
+                            else:
+                                row_vals.append("")
+                        placeholders = ",".join(["?"] * len(col_names))
+                        col_list = ",".join(col_names)
+                        cur.execute(f"INSERT INTO products ({col_list}) VALUES ({placeholders})", row_vals)
+                    conn.commit()
+        except Exception as e:
+            print(f"SQLite sync notice: {e}")
+
+
+def _persist_products_to_db(items: list[dict]) -> list[dict]:
     normalized = _normalize_product_list(items)
     if not normalized:
         return db.list_products()
-
-    # 1. Try any native bulk replace/save function on db
-    for fn_name in ("replace_products", "save_products", "set_products", "reset_products", "import_products", "seed_products"):
-        fn = getattr(db, fn_name, None)
-        if callable(fn):
-            try:
-                fn(normalized)
-            except Exception:
-                pass
-
-    # 2. Check if db uses SQLite and write all rows directly so no row is dropped
-    try:
-        conn = None
-        close_after = False
-        for conn_fn_name in ("_conn", "conn", "get_conn", "connect", "get_db"):
-            conn_fn = getattr(db, conn_fn_name, None)
-            if callable(conn_fn):
-                res = conn_fn()
-                if hasattr(res, "__enter__"):
-                    conn = res.__enter__()
-                elif isinstance(res, sqlite3.Connection):
-                    conn = res
-                    close_after = True
-                break
-
-        if conn is None:
-            for path_attr in ("DB_PATH", "DB_FILE", "PATH", "DB"):
-                db_path = getattr(db, path_attr, None)
-                if isinstance(db_path, (str, os.PathLike)) and os.path.exists(str(db_path)):
-                    conn = sqlite3.connect(str(db_path))
-                    close_after = True
-                    break
-
-        if conn is not None:
-            cur = conn.cursor()
-            tables = [r[0] for r in cur.execute("SELECT name FROM sqlite_master WHERE type='table'").fetchall()]
-            if "products" in tables:
-                cols_info = cur.execute("PRAGMA table_info(products)").fetchall()
-                col_names = [c[1] for c in cols_info]
-                cur.execute("DELETE FROM products")
-                for p in normalized:
-                    row_vals = []
-                    for c in col_names:
-                        if c in p:
-                            row_vals.append(p[c])
-                        elif c == "status":
-                            s = p["stock"]
-                            row_vals.append("Sold out" if s == 0 else f"Only {s} left" if s <= 2 else "In stock")
-                        else:
-                            row_vals.append("")
-                    placeholders = ",".join(["?"] * len(col_names))
-                    col_list = ",".join(col_names)
-                    cur.execute(f"INSERT INTO products ({col_list}) VALUES ({placeholders})", row_vals)
-                conn.commit()
-            if close_after:
-                conn.close()
-    except Exception as e:
-        print(f"Direct SQLite sync notice: {e}")
-
-    # 3. Verify db.list_products() returns all imported products; if not, hook db methods
-    current = _ORIG_LIST_PRODUCTS() if callable(_ORIG_LIST_PRODUCTS) else []
-    if len(current) != len(normalized):
-        _CUSTOM_CATALOG = [dict(p) for p in normalized]
-
-        def _custom_list_products():
-            return [dict(p) for p in _CUSTOM_CATALOG]
-
-        def _custom_get_product(pid: int):
-            for p in _CUSTOM_CATALOG:
-                if int(p["id"]) == int(pid):
-                    return dict(p)
-            return None
-
-        def _custom_set_stock(pid: int, stock: int):
-            for p in _CUSTOM_CATALOG:
-                if int(p["id"]) == int(pid):
-                    p["stock"] = int(stock)
-                    p["updated_at"] = _now_iso()
-                    return dict(p)
-            return None
-
-        db.list_products = _custom_list_products
-        db.get_product = _custom_get_product
-        db.set_stock = _custom_set_stock
-    else:
-        _CUSTOM_CATALOG = []
-        if callable(_ORIG_LIST_PRODUCTS):
-            db.list_products = _ORIG_LIST_PRODUCTS
-        if callable(_ORIG_GET_PRODUCT):
-            db.get_product = _ORIG_GET_PRODUCT
-        if callable(_ORIG_SET_STOCK):
-            db.set_stock = _ORIG_SET_STOCK
-
+    _sync_sqlite_table(normalized)
+    _install_catalog_hooks(normalized)
     return db.list_products()
 
 
@@ -221,18 +256,125 @@ def _fetch_url_text(url: str, accept: str = "*/*") -> str:
         headers={
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36",
             "Accept": accept,
+            "Accept-Encoding": "identity",
+            "Cache-Control": "no-cache",
         },
     )
     with urllib.request.urlopen(req, timeout=12) as resp:
         return resp.read().decode("utf-8", errors="replace")
 
 
-def _extract_products_from_json_obj(data) -> list[dict]:
-    """Recursively extracts product dicts from Shopify, WooCommerce, Next.js, or custom JSON."""
-    results = []
+def _extract_balanced_objects(text: str) -> list[str]:
+    """Finds all {...} object literals in JS/JSON text, handling nested braces and strings accurately."""
+    objs = []
+    depth = 0
+    start = -1
+    in_str = None
+    escape = False
 
+    for i, ch in enumerate(text):
+        if escape:
+            escape = False
+            continue
+        if ch == "\\":
+            escape = True
+            continue
+        if in_str:
+            if ch == in_str:
+                in_str = None
+            continue
+        if ch in ('"', "'", "`"):
+            in_str = ch
+            continue
+        if ch == "{":
+            if depth == 0:
+                start = i
+            depth += 1
+        elif ch == "}":
+            if depth > 0:
+                depth -= 1
+                if depth == 0 and start != -1:
+                    span = i - start + 1
+                    if 15 <= span <= 4000:
+                        objs.append(text[start:i + 1])
+                    start = -1
+    return objs
+
+
+def _extract_products_from_script_text(script_text: str) -> list[dict]:
+    """Universal extractor for JS/TypeScript/React/Vite/Next.js/JSON product objects."""
+    if not script_text or len(script_text) < 15:
+        return []
+
+    variants_to_scan = [script_text]
+    if '\"' in script_text or "\'" in script_text:
+        variants_to_scan.append(script_text.replace('\"', '"').replace("\'", "'"))
+
+    best: list[dict] = []
+
+    name_re = re.compile(
+        r"""(?:['"`]?(?:name|title|product_name|productName|item_name)['"`]?)\s*:\s*['"`]([^'"`\]{2,100})['"`]"""
+    )
+    price_re = re.compile(
+        r"""(?:['"`]?(?:price|mrp|cost|amount|unit_price|sale_price)['"`]?)\s*:\s*['"`]?\s*(₹|\$|Rs\.?|INR|USD|€|£)?\s*(\d+(?:,\d{3})*(?:\.\d+)?)\s*['"`]?""",
+        re.IGNORECASE,
+    )
+    stock_re = re.compile(
+        r"""(?:['"`]?(?:stock|qty|quantity|inventory|inventory_quantity|count)['"`]?)\s*:\s*['"`]?(\d+)['"`]?""",
+        re.IGNORECASE,
+    )
+    cat_re = re.compile(
+        r"""(?:['"`]?(?:category|cat|department|collection|group)['"`]?)\s*:\s*['"`]([^'"`\]{2,50})['"`]""",
+        re.IGNORECASE,
+    )
+    size_re = re.compile(
+        r"""(?:['"`]?(?:sizes|size|variant)['"`]?)\s*:\s*['"`]([^'"`\]{1,50})['"`]""",
+        re.IGNORECASE,
+    )
+
+    for text in variants_to_scan:
+        found = []
+        for obj_str in _extract_balanced_objects(text):
+            nm = name_re.search(obj_str)
+            pm = price_re.search(obj_str)
+            if not (nm and pm):
+                continue
+            name_val = nm.group(1).strip()
+            # Filter out non-product metadata objects
+            if name_val.lower() in ("home", "admin", "store", "default", "main", "index", "app", "shelftalk"):
+                continue
+            curr_sym = (pm.group(1) or "").strip()
+            currency = "$" if ("$" in curr_sym or "USD" in curr_sym.upper()) else ("₹" if curr_sym else "")
+            price_val = float(pm.group(2).replace(",", ""))
+
+            sm = stock_re.search(obj_str)
+            stock_val = int(sm.group(1)) if sm else 8
+
+            cm = cat_re.search(obj_str)
+            cat_val = cm.group(1).strip() if cm else ""
+
+            szm = size_re.search(obj_str)
+            size_val = szm.group(1).strip() if szm else (cat_val or "Standard")
+
+            found.append({
+                "name": name_val,
+                "price": price_val,
+                "stock": stock_val,
+                "category": cat_val,
+                "sizes": size_val,
+                "currency": currency,
+            })
+
+        norm = _normalize_product_list(found)
+        if len(norm) > len(best):
+            best = norm
+
+    return best
+
+
+def _extract_products_from_json_obj(data) -> list[dict]:
+    results = []
     if isinstance(data, dict):
-        # Shopify products.json format
         if isinstance(data.get("products"), list):
             for item in data["products"]:
                 if not isinstance(item, dict):
@@ -246,47 +388,31 @@ def _extract_products_from_json_obj(data) -> list[dict]:
                     sizes = ", ".join(
                         str(v.get("title", "")) for v in variants
                         if isinstance(v, dict) and v.get("title") and v.get("title") != "Default Title"
-                    ) or str(item.get("sizes") or "Standard")
+                    ) or str(item.get("category") or item.get("sizes") or "Standard")
                     stock = sum(
                         int(v.get("inventory_quantity", 5) if v.get("inventory_quantity") is not None else (5 if v.get("available", True) else 0))
                         for v in variants if isinstance(v, dict)
                     )
                 else:
-                    price = item.get("price") or item.get("p") or 0
-                    sizes = item.get("sizes") or item.get("size") or "Standard"
-                    stock = item.get("stock") if item.get("stock") is not None else (item.get("inventory") or 8)
-                results.append({"name": name, "price": price, "stock": stock, "sizes": sizes})
+                    price = item.get("price") if item.get("price") is not None else item.get("p", 0)
+                    sizes = item.get("category") or item.get("sizes") or item.get("size") or "Standard"
+                    stock = item.get("stock") if item.get("stock") is not None else (item.get("inventory") if item.get("inventory") is not None else 8)
+                results.append({
+                    "name": name,
+                    "price": price,
+                    "stock": stock,
+                    "category": str(item.get("category") or item.get("product_type") or ""),
+                    "sizes": sizes,
+                    "currency": item.get("currency") or "",
+                })
             if results:
-                return results
+                return _normalize_product_list(results)
 
-        # Check other common container keys
         for key in ("items", "catalog", "data", "inventory", "results", "edges", "nodes"):
             if key in data and isinstance(data[key], (list, dict)):
                 sub = _extract_products_from_json_obj(data[key])
                 if len(sub) > len(results):
                     results = sub
-
-        # Single JSON-LD Product or Offer
-        if data.get("@type") in ("Product", "IndividualProduct") and (data.get("name") or data.get("title")):
-            offers = data.get("offers") or {}
-            if isinstance(offers, list):
-                offers = offers[0] if offers else {}
-            price = offers.get("price") if isinstance(offers, dict) else data.get("price", 0)
-            avail = str(offers.get("availability", "")) if isinstance(offers, dict) else ""
-            stock = 0 if "OutOfStock" in avail else 8
-            results.append({
-                "name": data.get("name") or data.get("title"),
-                "price": price or 0,
-                "stock": stock,
-                "sizes": data.get("size") or "Standard",
-            })
-
-        # JSON-LD ItemList
-        if data.get("@type") == "ItemList" and isinstance(data.get("itemListElement"), list):
-            for el in data["itemListElement"]:
-                if isinstance(el, dict):
-                    item_node = el.get("item") if isinstance(el.get("item"), dict) else el
-                    results.extend(_extract_products_from_json_obj(item_node))
 
     elif isinstance(data, list):
         candidate_list = []
@@ -305,14 +431,17 @@ def _extract_products_from_json_obj(data) -> list[dict]:
                     stock = item.get("stock") if item.get("stock") is not None else item.get("s")
                     if stock is None:
                         stock = item.get("inventory") if item.get("inventory") is not None else (0 if item.get("is_in_stock") is False else 8)
-                    sizes = item.get("sizes") or item.get("size") or "Standard"
+                    category = str(item.get("category") or item.get("type") or "")
+                    sizes = item.get("sizes") or item.get("size") or category or "Standard"
                     if isinstance(sizes, list):
                         sizes = ", ".join(str(x) for x in sizes) or "Standard"
                     candidate_list.append({
                         "name": str(name),
                         "price": price,
                         "stock": stock,
+                        "category": category,
                         "sizes": str(sizes),
+                        "currency": item.get("currency") or "",
                     })
                 else:
                     sub = _extract_products_from_json_obj(item)
@@ -324,107 +453,112 @@ def _extract_products_from_json_obj(data) -> list[dict]:
     return _normalize_product_list(results)
 
 
-def _extract_products_from_html_or_js(raw_html: str, base_url: str) -> list[dict]:
-    """Extracts all products from an HTML storefront, JSON-LD, __NEXT_DATA__, inline JS arrays, or product cards."""
-    candidates: list[dict] = []
+def _extract_products_from_html_tables_and_cards(raw_html: str) -> list[dict]:
+    """Extracts products from HTML <table> rows (like Hearth & Co. admin/storefront) and DOM product cards."""
+    best: list[dict] = []
 
-    # 1. JSON-LD blocks & Next.js __NEXT_DATA__
-    for script_body in re.findall(r"<script[^>]*>([\s\S]*?)</script>", raw_html, flags=re.IGNORECASE):
-        s = script_body.strip()
-        if not s:
+    # 1. HTML Table rows: <tr>...</tr>
+    table_items = []
+    for tr_m in re.finditer(r"<tr[^>]*>([\s\S]*?)</tr>", raw_html, flags=re.IGNORECASE):
+        row_html = tr_m.group(1)
+        if "<th" in row_html.lower():
             continue
-        if s.startswith("{") or s.startswith("["):
-            try:
-                parsed = json.loads(s)
-                found = _extract_products_from_json_obj(parsed)
-                if len(found) > len(candidates):
-                    candidates = found
-            except Exception:
-                pass
+        tds = re.findall(r"<td[^>]*>([\s\S]*?)</td>", row_html, flags=re.IGNORECASE)
+        if len(tds) < 2:
+            continue
 
-        # 2. Inline JS product array literals: e.g. const products = [ { ... }, ... ]
-        for arr_match in re.finditer(r"\[\s*\{[\s\S]{20,25000}?\}\s*\]", s):
-            snippet = arr_match.group(0)
-            # Extract objects having name/title and price
-            obj_items = []
-            for obj_m in re.finditer(r"\{([^{}]{10,1500})\}", snippet):
-                body = obj_m.group(1)
-                name_m = re.search(r"""(?:name|title|product_name|n)\s*:\s*['"`]([^'"`]{2,120})['"`]""", body)
-                price_m = re.search(r"""(?:price|p|mrp|cost|amount)\s*:\s*['"`]?₹?\s*(\d+(?:,\d{3})*(?:\.\d+)?)['"`]?""", body)
-                if name_m and price_m:
-                    stock_m = re.search(r"""(?:stock|s|qty|quantity|inventory)\s*:\s*(\d+)""", body)
-                    size_m = re.search(r"""(?:sizes|size)\s*:\s*['"`]([^'"`]+)['"`]""", body)
-                    obj_items.append({
-                        "name": name_m.group(1).strip(),
-                        "price": float(price_m.group(1).replace(",", "")),
-                        "stock": int(stock_m.group(1)) if stock_m else 8,
-                        "sizes": size_m.group(1).strip() if size_m else "Standard",
-                    })
-            norm_objs = _normalize_product_list(obj_items)
-            if len(norm_objs) > len(candidates):
-                candidates = norm_objs
+        # Clean text for each td
+        td_texts = []
+        for td in tds:
+            inp_val = re.search(r"""<input[^>]+value=['"]?(\d+)['"]?""", td, flags=re.IGNORECASE)
+            cleaned = html_lib.unescape(re.sub(r"<[^>]+>", " ", td))
+            cleaned = re.sub(r"\s+", " ", cleaned).strip()
+            if inp_val and not cleaned:
+                cleaned = inp_val.group(1)
+            td_texts.append(cleaned)
 
-    # 3. Check linked local JS / JSON scripts if we still have <= 4 products
-    if len(candidates) <= 4:
-        for src_attr in re.findall(r"""<script[^>]+src=['"]([^'"]+)['"]""", raw_html, flags=re.IGNORECASE):
-            if any(skip in src_attr for skip in ("googleapis", "gstatic", "analytics", "gtag", "facebook", "cdn")):
+        full_row_text = " | ".join(td_texts)
+        price_m = re.search(r"(₹|\$|Rs\.?|INR|USD|€|£)\s*(\d+(?:,\d{3})*(?:\.\d+)?)", full_row_text, flags=re.IGNORECASE)
+        if not price_m:
+            continue
+
+        curr_sym = price_m.group(1)
+        currency = "$" if ("$" in curr_sym or "USD" in curr_sym.upper()) else "₹"
+        price_val = float(price_m.group(2).replace(",", ""))
+
+        # First non-empty cell without price is the product name
+        name_val = ""
+        cat_val = ""
+        stock_val = None
+
+        for idx, txt in enumerate(td_texts):
+            if not txt:
                 continue
-            full_js_url = urllib.parse.urljoin(base_url, src_attr)
-            try:
-                js_text = _fetch_url_text(full_js_url)
-                obj_items = []
-                for obj_m in re.finditer(r"\{([^{}]{10,1500})\}", js_text):
-                    body = obj_m.group(1)
-                    name_m = re.search(r"""(?:name|title|product_name)\s*:\s*['"`]([^'"`]{2,120})['"`]""", body)
-                    price_m = re.search(r"""(?:price|mrp|cost|amount)\s*:\s*['"`]?₹?\s*(\d+(?:,\d{3})*(?:\.\d+)?)['"`]?""", body)
-                    if name_m and price_m:
-                        stock_m = re.search(r"""(?:stock|qty|quantity|inventory)\s*:\s*(\d+)""", body)
-                        size_m = re.search(r"""(?:sizes|size)\s*:\s*['"`]([^'"`]+)['"`]""", body)
-                        obj_items.append({
-                            "name": name_m.group(1).strip(),
-                            "price": float(price_m.group(1).replace(",", "")),
-                            "stock": int(stock_m.group(1)) if stock_m else 8,
-                            "sizes": size_m.group(1).strip() if size_m else "Standard",
-                        })
-                norm_objs = _normalize_product_list(obj_items)
-                if len(norm_objs) > len(candidates):
-                    candidates = norm_objs
-            except Exception:
-                pass
+            if re.search(r"(?:₹|\$|Rs\.?|INR|USD)\s*\d+", txt, flags=re.IGNORECASE):
+                continue
+            if txt.lower() in ("edit", "delete", "edit delete", "actions", "in stock", "low stock", "out of stock", "sold out"):
+                if "out of stock" in txt.lower() or "sold out" in txt.lower():
+                    stock_val = 0
+                continue
+            # Check if cell is stock control like "- 24 +" or "24"
+            stock_cell_m = re.match(r"^[\-−\+\s]*(\d+)[\-−\+\s]*$", txt)
+            if stock_cell_m:
+                stock_val = int(stock_cell_m.group(1))
+                continue
+            if not name_val:
+                name_val = re.sub(r"\s*(Edit|Delete)\s*$", "", txt, flags=re.IGNORECASE).strip()
+            elif not cat_val and len(txt) < 40:
+                cat_val = txt
 
-    # 4. HTML DOM Product Cards (headings + currency price like ₹799, Rs. 799, $25, etc.)
-    dom_items = []
-    # Match blocks around headings <h2>/<h3>/<h4>
-    heading_matches = list(re.finditer(r"<(h[234])[^>]*>([\s\S]*?)</\1>", raw_html, flags=re.IGNORECASE))
+        if stock_val is None:
+            if re.search(r"out\s*of\s*stock|sold\s*out", full_row_text, flags=re.IGNORECASE):
+                stock_val = 0
+            else:
+                sm = re.search(r"\b(\d+)\b", " ".join(td_texts[2:]))
+                stock_val = int(sm.group(1)) if sm else 8
+
+        if name_val and len(name_val) >= 2:
+            table_items.append({
+                "name": name_val,
+                "price": price_val,
+                "stock": stock_val,
+                "category": cat_val,
+                "sizes": cat_val or "Standard",
+                "currency": currency,
+            })
+
+    norm_table = _normalize_product_list(table_items)
+    if len(norm_table) > len(best):
+        best = norm_table
+
+    # 2. HTML Product Cards / Headings
+    card_items = []
+    heading_matches = list(re.finditer(r"<(h[2345]|strong|b)[^>]*>([\s\S]*?)</\1>", raw_html, flags=re.IGNORECASE))
     for idx, hm in enumerate(heading_matches):
         raw_title = re.sub(r"<[^>]+>", " ", hm.group(2))
         title = html_lib.unescape(re.sub(r"\s+", " ", raw_title)).strip()
-        if not title or len(title) < 2 or len(title) > 90:
+        if not title or len(title) < 3 or len(title) > 85:
             continue
         if any(bad in title.lower() for bad in (
             "connect your store", "how it works", "four checks", "where we are headed",
             "try it on your store", "needs owner", "instagram account", "synced products",
             "store instagram handle", "live synced catalog", "pipeline connection",
-            "customer", "faq", "about us", "contact", "footer", "newsletter", "cart"
-        )):
+            "total products", "total stock", "low stock", "out of stock", "policy"
+        )) or re.match(r"^[₹\$]?\d+", title):
             continue
 
         start_pos = hm.end()
-        end_pos = heading_matches[idx + 1].start() if idx + 1 < len(heading_matches) else min(len(raw_html), start_pos + 1800)
-        window = raw_html[start_pos:min(end_pos, start_pos + 1800)]
+        end_pos = heading_matches[idx + 1].start() if idx + 1 < len(heading_matches) else min(len(raw_html), start_pos + 1200)
+        window = raw_html[start_pos:min(end_pos, start_pos + 1200)]
         window_text = html_lib.unescape(re.sub(r"<[^>]+>", " ", window))
 
-        price_m = re.search(
-            r"(?:₹|Rs\.?|INR|\$|€|£)\s*(\d+(?:,\d{3})*(?:\.\d+)?)|(?:price|mrp)\s*[:=-]?\s*(\d+(?:,\d{3})*(?:\.\d+)?)",
-            window_text,
-            flags=re.IGNORECASE,
-        )
+        price_m = re.search(r"(₹|\$|Rs\.?|INR|USD|€|£)\s*(\d+(?:,\d{3})*(?:\.\d+)?)", window_text, flags=re.IGNORECASE)
         if not price_m:
             continue
-        price_str = price_m.group(1) or price_m.group(2)
-        price_val = float(price_str.replace(",", ""))
+        curr_sym = price_m.group(1)
+        currency = "$" if ("$" in curr_sym or "USD" in curr_sym.upper()) else "₹"
+        price_val = float(price_m.group(2).replace(",", ""))
 
-        # Look for stock number in the card window
         stock_val = 8
         out_m = re.search(r"<output[^>]*>\s*(\d+)\s*</output>", window, flags=re.IGNORECASE)
         if out_m:
@@ -436,21 +570,132 @@ def _extract_products_from_html_or_js(raw_html: str, base_url: str) -> list[dict
             if left_m:
                 stock_val = int(left_m.group(1))
 
-        size_m = re.search(r"sizes?\s*[:=-]\s*([A-Za-z0-9,\s/\-]+)", window_text, flags=re.IGNORECASE)
-        sizes_val = size_m.group(1).strip()[:40] if size_m else "Standard"
-
-        dom_items.append({
+        card_items.append({
             "name": title,
             "price": price_val,
             "stock": stock_val,
-            "sizes": sizes_val,
+            "sizes": "Standard",
+            "currency": currency,
         })
 
-    norm_dom = _normalize_product_list(dom_items)
-    if len(norm_dom) > len(candidates):
-        candidates = norm_dom
+    norm_cards = _normalize_product_list(card_items)
+    if len(norm_cards) > len(best):
+        best = norm_cards
 
-    return candidates
+    return best
+
+
+def _scrape_store_products(url: str) -> list[dict]:
+    """Scrapes all products in real time from a Store URL (API endpoints, HTML tables/cards, inline & bundled JS)."""
+    base = url.rstrip("/")
+    parsed_u = urllib.parse.urlparse(base)
+    origin = f"{parsed_u.scheme}://{parsed_u.netloc}"
+    best: list[dict] = []
+
+    # 1. Try common JSON & API endpoints on the store
+    json_endpoints = [
+        base if base.endswith(".json") else f"{base}/api/products",
+        f"{origin}/api/products",
+        f"{origin}/api/inventory",
+        f"{origin}/api/catalog",
+        f"{origin}/api/store",
+        f"{origin}/api/items",
+        f"{origin}/products.json?limit=250",
+        f"{origin}/data/products.json",
+        f"{origin}/catalog.json",
+        f"{origin}/inventory.json",
+        f"{origin}/wp-json/wc/store/products?per_page=100",
+    ]
+    seen_ep = set()
+    for ep in json_endpoints:
+        if ep in seen_ep:
+            continue
+        seen_ep.add(ep)
+        try:
+            raw = _fetch_url_text(ep, accept="application/json, text/plain, */*")
+            stripped = raw.lstrip()
+            if stripped.startswith(("{", "[")):
+                extracted = _extract_products_from_json_obj(json.loads(stripped))
+                if len(extracted) > len(best):
+                    best = extracted
+        except Exception:
+            pass
+
+    # 2. Fetch the Store HTML page(s) and inspect inline scripts, linked JS bundles, discovered API routes, and HTML DOM
+    pages_to_check = [url]
+    if base == origin:
+        pages_to_check.extend([f"{origin}/admin", f"{origin}/admin.html"])
+
+    checked_scripts = set()
+    for page_url in pages_to_check:
+        try:
+            raw_page = _fetch_url_text(page_url)
+        except Exception:
+            continue
+
+        stripped = raw_page.lstrip()
+        if stripped.startswith(("{", "[")):
+            try:
+                extracted = _extract_products_from_json_obj(json.loads(stripped))
+                if len(extracted) > len(best):
+                    best = extracted
+            except Exception:
+                pass
+            continue
+
+        # 2a. Check inline <script> blocks
+        for script_body in re.findall(r"<script[^>]*>([\s\S]*?)</script>", raw_page, flags=re.IGNORECASE):
+            s = script_body.strip()
+            if not s:
+                continue
+            if s.startswith(("{", "[")):
+                try:
+                    extracted = _extract_products_from_json_obj(json.loads(s))
+                    if len(extracted) > len(best):
+                        best = extracted
+                except Exception:
+                    pass
+            extracted_js = _extract_products_from_script_text(s)
+            if len(extracted_js) > len(best):
+                best = extracted_js
+
+        # 2b. Check HTML Tables & Product Cards
+        extracted_dom = _extract_products_from_html_tables_and_cards(raw_page)
+        if len(extracted_dom) > len(best):
+            best = extracted_dom
+
+        # 2c. Check linked <script src="..."> bundles and any API/JSON paths inside them
+        script_srcs = re.findall(r"""<script[^>]+src=['"]?([^'"\s>]+)['"]?""", raw_page, flags=re.IGNORECASE)
+        for src_attr in script_srcs:
+            if any(skip in src_attr.lower() for skip in ("googleapis", "gstatic", "analytics", "gtag", "facebook")):
+                continue
+            full_js_url = urllib.parse.urljoin(page_url, src_attr)
+            if full_js_url in checked_scripts:
+                continue
+            checked_scripts.add(full_js_url)
+            try:
+                js_text = _fetch_url_text(full_js_url)
+                extracted_bundle = _extract_products_from_script_text(js_text)
+                if len(extracted_bundle) > len(best):
+                    best = extracted_bundle
+
+                # Also check if the JS bundle fetches a JSON or API path
+                for api_m in re.finditer(r"""['"`]((?:/api/|/data/|https?://[^'"`\s]+)(?:products|inventory|catalog|items|store)[^'"`\s]*)['"`]""", js_text):
+                    disc_url = urllib.parse.urljoin(origin, api_m.group(1))
+                    if disc_url not in seen_ep:
+                        seen_ep.add(disc_url)
+                        try:
+                            api_raw = _fetch_url_text(disc_url, accept="application/json, */*")
+                            if api_raw.lstrip().startswith(("{", "[")):
+                                ext_api = _extract_products_from_json_obj(json.loads(api_raw.lstrip()))
+                                if len(ext_api) > len(best):
+                                    best = ext_api
+                        except Exception:
+                            pass
+            except Exception:
+                pass
+
+    return best
 
 
 def _parse_google_sheet_all_rows(url: str) -> list[dict]:
@@ -494,70 +739,30 @@ def _parse_google_sheet_all_rows(url: str) -> list[dict]:
             or norm_row.get("inventory")
             or "8"
         )
-        sizes = norm_row.get("sizes") or norm_row.get("size") or "Standard"
-        aliases = norm_row.get("aliases") or norm_row.get("keywords") or _make_aliases(name)
+        category = norm_row.get("category") or norm_row.get("type") or ""
+        sizes = norm_row.get("sizes") or norm_row.get("size") or category or "Standard"
+        aliases = norm_row.get("aliases") or norm_row.get("keywords") or _make_aliases(name, category)
         items.append({
             "name": name,
             "price": price,
             "stock": stock,
+            "category": category,
             "sizes": sizes,
             "aliases": aliases,
         })
     return _normalize_product_list(items)
 
 
-def _scrape_store_products(url: str) -> list[dict]:
-    """Scrapes all products from a Store URL (JSON endpoints, Shopify, WooCommerce, HTML DOM, JS bundles)."""
-    base = url.rstrip("/")
-    parsed_u = urllib.parse.urlparse(base)
-    origin = f"{parsed_u.scheme}://{parsed_u.netloc}"
-    best: list[dict] = []
-
-    # 1. Try common JSON product endpoints first
-    json_endpoints = [
-        base if base.endswith(".json") else f"{base}/products.json?limit=250",
-        f"{origin}/products.json?limit=250",
-        f"{origin}/api/products",
-        f"{origin}/data/products.json",
-        f"{origin}/wp-json/wc/store/products?per_page=100",
-    ]
-    seen_ep = set()
-    for ep in json_endpoints:
-        if ep in seen_ep:
-            continue
-        seen_ep.add(ep)
-        try:
-            raw = _fetch_url_text(ep, accept="application/json, text/plain, */*")
-            if raw.lstrip().startswith(("{", "[")):
-                data = json.loads(raw)
-                extracted = _extract_products_from_json_obj(data)
-                if len(extracted) > len(best):
-                    best = extracted
-        except Exception:
-            pass
-
-    # 2. Fetch the Store URL itself (could be HTML or JSON)
-    try:
-        raw_page = _fetch_url_text(url)
-        stripped = raw_page.lstrip()
-        if stripped.startswith(("{", "[")):
-            extracted = _extract_products_from_json_obj(json.loads(stripped))
-            if len(extracted) > len(best):
-                best = extracted
-        else:
-            extracted = _extract_products_from_html_or_js(raw_page, url)
-            if len(extracted) > len(best):
-                best = extracted
-    except Exception as e:
-        print(f"Store page fetch notice: {e}")
-
-    return best
-
-
 @asynccontextmanager
 async def lifespan(app):
     db.init_db()
     _patch_store_and_db_limits()
+    # If a source_url was previously persisted, sync it on startup
+    if STORE_SETTINGS.get("source_url"):
+        try:
+            _import_store_or_sheet(STORE_SETTINGS["source_url"])
+        except Exception:
+            pass
     yield
 
 
@@ -584,55 +789,43 @@ class StockIn(BaseModel):
 class ConnectIn(BaseModel):
     url: str = Field(min_length=8, max_length=500)
     owner_username: str | None = None
+    products: list[dict] | None = None
 
 
 class OwnerHandleRequest(BaseModel):
     owner_username: str
 
 
-STORE_SETTINGS = {
-    "owner_username": "",
-    "source_url": "",
-    "source_type": "",
-}
-
-VERIFY_TOKEN = os.getenv("INSTAGRAM_VERIFY_TOKEN", "shelftalk_verify_2026")
-
-
 def _view(p):
-    s = p["stock"]
-    status = "Sold out" if s == 0 else f"Only {s} left" if s <= 2 else "In stock"
+    s = int(p["stock"])
+    status = "Sold out" if s == 0 else f"Only {s} left" if s <= 5 else "In stock"
+    curr = p.get("currency") or STORE_SETTINGS.get("currency", "₹")
     return {
         "id": p["id"],
         "name": p["name"],
         "price": p["price"],
         "stock": s,
-        "sizes": p.get("sizes", "Standard"),
+        "sizes": p.get("sizes") or p.get("category") or "Standard",
+        "category": p.get("category") or p.get("sizes") or "Standard",
+        "currency": curr,
         "status": status,
         "updated_at": p.get("updated_at", ""),
     }
 
 
-def _import_store_or_sheet(raw_url: str):
-    """Imports ALL products (8, 20, 50+) from either a Store URL or a Google Sheet without any 4-product cap."""
+def _import_store_or_sheet(raw_url: str, client_products: list[dict] | None = None):
+    """Imports ALL products in real time from either a Store URL or a Google Sheet."""
     _patch_store_and_db_limits()
     url = raw_url.strip()
     is_sheet = "docs.google.com/spreadsheets" in url
 
-    store_py_products: list[dict] = []
-    store_py_error = None
+    chosen: list[dict] = []
 
-    # 1. Run store.import_store (now patched with 100-item limit instead of 4)
-    try:
-        store.import_store(url)
-        if callable(_ORIG_LIST_PRODUCTS):
-            store_py_products = _ORIG_LIST_PRODUCTS()
-        else:
-            store_py_products = db.list_products()
-    except Exception as e:
-        store_py_error = e
+    # 1. If the browser client already scraped live DOM/API products from the store URL, consider them
+    if client_products:
+        chosen = _normalize_product_list(client_products)
 
-    # 2. Also run our unlimited parser so no store or sheet is ever truncated to 4 products
+    # 2. Run our unlimited real-time scraper for Google Sheets or Store URLs
     direct_products: list[dict] = []
     try:
         if is_sheet:
@@ -642,19 +835,32 @@ def _import_store_or_sheet(raw_url: str):
     except Exception as e:
         print(f"Direct scraper notice: {e}")
 
-    # Pick whichever extracted the larger complete catalog (e.g. all 8 products instead of 4)
-    chosen = direct_products if len(direct_products) > len(store_py_products) else store_py_products
+    if len(direct_products) >= len(chosen) and len(direct_products) > 0:
+        chosen = direct_products
+
+    # 3. Also test store.import_store (patched to 200 items) if we still need fallback
+    store_py_error = None
+    if not chosen:
+        try:
+            store.import_store(url)
+            if callable(_ORIG_LIST_PRODUCTS):
+                chosen = _ORIG_LIST_PRODUCTS()
+        except Exception as e:
+            store_py_error = e
 
     if chosen:
         saved = _persist_products_to_db(chosen)
         STORE_SETTINGS["source_url"] = url
         STORE_SETTINGS["source_type"] = "google_sheet" if is_sheet else "store_url"
+        STORE_SETTINGS["last_sync_ts"] = time.time()
+        _save_persisted_settings()
         return {
             "ok": True,
             "imported": len(saved),
             "count": len(saved),
             "source_url": url,
             "source_type": STORE_SETTINGS["source_type"],
+            "currency": STORE_SETTINGS.get("currency", "₹"),
             "products": [_view(p) for p in saved],
         }
 
@@ -663,8 +869,108 @@ def _import_store_or_sheet(raw_url: str):
     raise HTTPException(status_code=422, detail="No products found at the provided Store URL or Google Sheet.")
 
 
+def _maybe_realtime_refresh(source_url_hint: str | None = None, owner_hint: str | None = None, force: bool = False):
+    """Automatically refreshes the catalog from the connected Store URL or Google Sheet in real time."""
+    if owner_hint:
+        clean_owner = owner_hint.replace("@", "").strip()
+        if clean_owner and not STORE_SETTINGS.get("owner_username"):
+            STORE_SETTINGS["owner_username"] = clean_owner
+            _save_persisted_settings()
+
+    target_url = (source_url_hint or STORE_SETTINGS.get("source_url") or "").strip()
+    if not target_url:
+        return
+
+    now = time.time()
+    url_changed = target_url != STORE_SETTINGS.get("source_url")
+    stale = (now - float(STORE_SETTINGS.get("last_sync_ts") or 0.0)) >= 4.0
+    using_default_seed = not _CUSTOM_CATALOG
+
+    if force or url_changed or stale or using_default_seed:
+        try:
+            _import_store_or_sheet(target_url)
+        except Exception as e:
+            print(f"Real-time refresh notice for {target_url}: {e}")
+
+
+def _format_price(price, curr: str | None = None) -> str:
+    c = curr or STORE_SETTINGS.get("currency", "₹")
+    if c == "$":
+        p_float = float(price)
+        return f"${p_float:.2f}" if not p_float.is_integer() else f"${int(p_float)}.00"
+    return f"₹{price}"
+
+
+def _smart_catalog_reply(text: str) -> dict | None:
+    """Answers product, price, stock, and catalog queries directly from the live synced store catalog."""
+    prods = db.list_products()
+    if not prods:
+        return None
+
+    q = text.lower().strip()
+    curr = STORE_SETTINGS.get("currency", "₹")
+
+    # 1. Check if customer is asking for a specific product in the live catalog
+    matched_prod = None
+    best_score = 0
+    q_words = set(re.findall(r"[a-z0-9]+", q))
+
+    for p in prods:
+        p_name = p["name"].lower()
+        if p_name in q:
+            matched_prod = p
+            break
+        p_words = [w for w in re.findall(r"[a-z0-9]+", p_name) if len(w) > 2]
+        score = sum(2 if w in q_words else (1 if w in q else 0) for w in p_words)
+        if score > best_score and score >= 2:
+            best_score = score
+            matched_prod = p
+
+    if matched_prod:
+        s = int(matched_prod["stock"])
+        p_str = _format_price(matched_prod["price"], matched_prod.get("currency", curr))
+        name = matched_prod["name"]
+        if s == 0:
+            return {
+                "reply": f"{name} ({p_str}) is currently out of stock.",
+                "status": "replied",
+                "reason": "",
+                "note": "Verified from live store catalog",
+            }
+        if s <= 5:
+            return {
+                "reply": f"{name} is {p_str} — only {s} left in stock!",
+                "status": "replied",
+                "reason": "",
+                "note": "Verified from live store catalog",
+            }
+        return {
+            "reply": f"{name} is {p_str} and in stock ({s} available).",
+            "status": "replied",
+            "reason": "",
+            "note": "Verified from live store catalog",
+        }
+
+    # 2. Check if customer is asking "What products do you have?" / "What is in stock?"
+    if any(k in q for k in ("what product", "which product", "what do you have", "catalog", "all product", "in stock", "items", "menu", "sell")):
+        in_stock_items = [
+            f"{p['name']} ({_format_price(p['price'], p.get('currency', curr))}, {p['stock']} left)"
+            for p in prods if int(p["stock"]) > 0
+        ]
+        summary = ", ".join(in_stock_items[:8])
+        return {
+            "reply": f"Here is our live in-stock catalog ({len(in_stock_items)} of {len(prods)} items available): {summary}.",
+            "status": "replied",
+            "reason": "",
+            "note": "Listed live store catalog",
+        }
+
+    return None
+
+
 def _query_botpress_or_brain(user_id: str, text: str) -> dict:
-    """Forwards incoming message + full synced catalog to Botpress if configured, with local catalog brain fallback."""
+    """Refreshes catalog in real time, forwards to Botpress if configured, or answers from live catalog & brain."""
+    _maybe_realtime_refresh()
     bp_url = os.getenv("BOTPRESS_WEBHOOK_URL", "").strip()
     catalog = [_view(p) for p in db.list_products()]
 
@@ -701,7 +1007,18 @@ def _query_botpress_or_brain(user_id: str, text: str) -> dict:
         except Exception as e:
             print(f"Botpress webhook fallback notice: {e}")
 
-    return brain.handle_message(text, "instagram")
+    # Check if it's a direct product/catalog query for our live synced store
+    q_low = text.lower()
+    is_escalation = any(w in q_low for w in ("discount", "% off", "refund", "damaged", "complain", "human", "owner", "custom", "negotiate"))
+    if not is_escalation:
+        direct_ans = _smart_catalog_reply(text)
+        if direct_ans:
+            return direct_ans
+
+    r = brain.handle_message(text, "instagram")
+    if STORE_SETTINGS.get("currency") == "$" and "₹" in r.get("reply", ""):
+        r["reply"] = r["reply"].replace("₹", "$")
+    return r
 
 
 def _send_instagram_dm(recipient_id: str, text: str):
@@ -736,7 +1053,8 @@ def _send_instagram_dm(recipient_id: str, text: str):
 
 
 @app.get("/api/health")
-def health():
+def health(source_url: str | None = Query(None), owner_username: str | None = Query(None)):
+    _maybe_realtime_refresh(source_url, owner_username)
     prods = db.list_products()
     q = db.list_queue()
     return {
@@ -745,6 +1063,7 @@ def health():
         "owner_username": STORE_SETTINGS["owner_username"],
         "source_url": STORE_SETTINGS["source_url"],
         "source_type": STORE_SETTINGS["source_type"],
+        "currency": STORE_SETTINGS.get("currency", "₹"),
         "product_count": len(prods),
         "queue_count": len(q),
         "meta_connected": bool(os.getenv("INSTAGRAM_ACCESS_TOKEN", "").strip()),
@@ -809,7 +1128,8 @@ def chat(body: ChatIn):
 
 
 @app.get("/api/products")
-def products():
+def products(source_url: str | None = Query(None), owner_username: str | None = Query(None)):
+    _maybe_realtime_refresh(source_url, owner_username)
     return [_view(p) for p in db.list_products()]
 
 
@@ -817,6 +1137,8 @@ def products():
 def update_stock(pid: int, body: StockIn):
     if not db.get_product(pid):
         raise HTTPException(404, "Product not found")
+    # Pause automatic overwrite for 30s after manual admin stock edit
+    STORE_SETTINGS["last_sync_ts"] = time.time() + 26.0
     return _view(db.set_stock(pid, body.stock))
 
 
@@ -842,6 +1164,7 @@ def chats():
 def update_owner_handle(req: OwnerHandleRequest):
     clean_name = req.owner_username.replace("@", "").strip()
     STORE_SETTINGS["owner_username"] = clean_name
+    _save_persisted_settings()
     return {"ok": True, "owner_username": clean_name}
 
 
@@ -851,4 +1174,5 @@ def connect(body: ConnectIn):
         clean_name = body.owner_username.replace("@", "").strip()
         if clean_name:
             STORE_SETTINGS["owner_username"] = clean_name
-    return _import_store_or_sheet(body.url)
+            _save_persisted_settings()
+    return _import_store_or_sheet(body.url, body.products)
