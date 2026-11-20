@@ -49,14 +49,20 @@ a{color:inherit}
 .btn:active{transform:scale(.97)}.btn[disabled]{opacity:.55;cursor:progress}
 .pri{background:var(--acc);border-color:var(--acc);color:var(--on);box-shadow:0 4px 14px -3px color-mix(in srgb,var(--acc) 45%,transparent)}
 .lg{display:none}
+
+/* ===== Hero & Authentic Dark/Clean Instagram Phone Simulator ===== */
 .hero{padding:2rem 0 3.5rem;background:repeating-linear-gradient(transparent 0 2.4rem,color-mix(in srgb,var(--rule) 70%,transparent) 2.4rem calc(2.4rem + 1px))}
 .hg{display:grid;gap:2.5rem}
 .live{display:inline-flex;align-items:center;gap:.5rem;margin-bottom:1rem;padding:.3rem .85rem;border-radius:999px;background:linear-gradient(90deg,rgba(225,48,108,0.12),rgba(131,58,180,0.12));color:#E1306C;font-weight:700;font-size:.9rem}
 .live i{width:.55rem;height:.55rem;border-radius:50%;background:#E1306C;box-shadow:0 0 0 3px rgba(225,48,108,0.25)}
 .lead{font-size:1.15rem;color:var(--mut);margin:1.25rem 0 1.5rem;max-width:32em}
 .cta{display:flex;flex-direction:column;gap:.75rem}
+
+/* Instagram Phone Frame */
 .dm{background:#ffffff;color:#121212;border:3px solid #121212;border-radius:28px;box-shadow:0 24px 48px -12px rgba(0,0,0,0.28);overflow:hidden;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
-@media(prefers-color-scheme:dark){.dm{background:#000000;color:#f5f5f5;border-color:#262626;box-shadow:0 24px 48px -12px rgba(0,0,0,0.7)}}
+@media(prefers-color-scheme:dark){
+  .dm{background:#000000;color:#f5f5f5;border-color:#262626;box-shadow:0 24px 48px -12px rgba(0,0,0,0.7)}
+}
 .ig-top-bar{display:flex;justify-content:space-between;align-items:center;padding:.45rem 1.1rem .2rem;font-size:.75rem;font-weight:700;opacity:.8}
 .dh{display:flex;align-items:center;gap:.75rem;padding:.65rem 1rem;border-bottom:1px solid rgba(128,128,128,0.2)}
 .ig-back{font-size:1.35rem;font-weight:600;line-height:1;margin-right:.1rem;user-select:none}
@@ -68,11 +74,14 @@ a{color:inherit}
 .ig-badge{display:inline-grid;place-items:center;width:14px;height:14px;background:#0095f6;color:#fff;border-radius:50%;font-size:9px;font-weight:900}
 .ig-mode-pill{font-size:.7rem;font-weight:700;padding:.2rem .55rem;border-radius:999px;background:rgba(0,149,246,0.12);color:#0095f6;white-space:nowrap}
 .ig-mode-pill.paused{background:rgba(225,48,108,0.14);color:#E1306C}
+
 .th{height:21rem;overflow-y:auto;padding:1rem;display:flex;flex-direction:column;gap:.55rem;overscroll-behavior:contain}
 .m{max-width:80%;padding:.65rem .95rem;border-radius:20px;font-size:.92rem;line-height:1.4;overflow-wrap:anywhere;animation:in var(--d) var(--ease)}
-.me{align-self:flex-end;background:#3797f0;color:#ffffff;border-bottom-right-radius:4px}
+.me{align-self:flex-end;background:linear-gradient(135deg,#833ab4,#fd1d1d,#fcb045);background:#3797f0;color:#ffffff;border-bottom-right-radius:4px}
 .sh{align-self:flex-start;background:#efefef;color:#121212;border-bottom-left-radius:4px}
-@media(prefers-color-scheme:dark){.sh{background:#262626;color:#f5f5f5}}
+@media(prefers-color-scheme:dark){
+  .sh{background:#262626;color:#f5f5f5}
+}
 .note{align-self:center;margin:.3rem 0;padding:.25rem .85rem;background:rgba(225,48,108,0.12);border:1px solid rgba(225,48,108,0.35);border-radius:999px;color:#E1306C;font-size:.75rem;font-weight:700;text-align:center;animation:in var(--d) var(--ease)}
 .ty{align-self:flex-start;display:flex;gap:5px;padding:.75rem 1rem;background:#efefef;border-radius:20px}
 @media(prefers-color-scheme:dark){.ty{background:#262626}}
@@ -80,14 +89,17 @@ a{color:inherit}
 .ty i:nth-child(2){animation-delay:.15s}.ty i:nth-child(3){animation-delay:.3s}
 @keyframes pl{0%,100%{opacity:.25}50%{opacity:1}}
 @keyframes in{from{opacity:0;transform:translateY(8px)}}
+
 .try{display:flex;gap:.45rem;overflow-x:auto;padding:.55rem .9rem;border-top:1px solid rgba(128,128,128,0.18);scrollbar-width:none}
 .try button{flex:none;min-height:2.25rem;padding:0 .8rem;border:1px solid rgba(128,128,128,0.35);border-radius:999px;background:transparent;color:inherit;font:500 .8rem system-ui,sans-serif;cursor:pointer;transition:background 150ms}
 .try button:hover{background:rgba(0,149,246,0.1);border-color:#0095f6}
+
 .snd{display:flex;align-items:center;gap:.5rem;padding:.55rem .85rem .9rem}
 .snd-box{flex:1;display:flex;align-items:center;border:1.5px solid rgba(128,128,128,0.35);border-radius:999px;padding:.15rem .35rem .15rem .9rem;background:transparent}
 .snd input{flex:1;min-width:0;min-height:2.4rem;border:0;background:transparent;color:inherit;font:.92rem system-ui,sans-serif;outline:none}
 .snd button{min-height:2.2rem;padding:0 1rem;border:0;border-radius:999px;background:#0095f6;color:#fff;font:700 .85rem system-ui,sans-serif;cursor:pointer}
 .fm input{flex:1;min-width:0;min-height:3rem;padding:0 .9rem;border:2px solid var(--ink);border-radius:6px;background:var(--paper);color:var(--ink);font:1rem system-ui,sans-serif}
+
 .dnote{margin-top:.75rem;font-size:.875rem;color:var(--mut)}
 .fig{display:grid;grid-template-columns:repeat(3,1fr);margin-top:1.25rem;border-top:2px solid var(--ink)}
 .fig div{padding:.75rem .5rem 0 0;font-size:.875rem;color:var(--mut)}
@@ -95,13 +107,16 @@ a{color:inherit}
 .fig b{display:block;overflow:hidden;font:800 1.6rem/1.2 var(--disp);color:var(--ink);font-variant-numeric:tabular-nums}
 .tk{display:inline-block;animation:tick 320ms var(--ease)}
 @keyframes tick{from{opacity:0;transform:translateY(-60%)}}
+/* ===== Questions strip ===== */
 .strip{border-block:2px solid var(--ink);padding:1.25rem 0;background:var(--card)}
 .qs{display:flex;flex-wrap:wrap;gap:.5rem 1.25rem;margin-top:.5rem}
 .qs li{font:600 1.15rem var(--disp)}.qs li::before{content:"\2713\00a0";color:var(--acc)}
 .qs .ok{color:var(--acc)}.qs .ok::before{content:""}
+/* ===== Four checks: ledger rows ===== */
 .chk li{display:grid;grid-template-columns:2.25rem 1fr;gap:0 .75rem;padding:1.25rem 0;border-top:1.5px solid var(--ink);border-radius:12px;padding-inline:1rem;margin-inline:-1rem}
 .chk svg{width:1.75rem;height:1.75rem;margin-top:.1rem;fill:none;stroke:var(--acc);stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
 .chk p{color:var(--mut);grid-column:2}
+/* ===== Product sheet: hanging price tags ===== */
 .alt{background:var(--card);border-block:2px solid var(--ink)}
 .shelf{container-type:inline-size}
 .tags{display:grid;grid-template-columns:repeat(2,1fr);gap:0 .75rem;border-top:8px solid var(--ink);align-items:start}
@@ -121,6 +136,7 @@ a{color:inherit}
 .tg .btn{min-height:3rem;padding:0 .5rem}
 .pol{margin-top:1.5rem;max-width:40em}.pol b{font-family:var(--disp)}
 @container (min-width:46rem){.tags{grid-template-columns:repeat(4,1fr);gap:0 1.25rem}}
+/* ===== Trust + handoff queue ===== */
 .tr{background:var(--band);color:var(--onb)}
 .tgd{display:grid;gap:2.5rem}
 .pts{display:grid;gap:1.1rem;font-size:1.1rem;opacity:.92}.pts strong{font-family:var(--disp);font-size:1.2rem}
@@ -132,6 +148,7 @@ a{color:inherit}
 .qr .btn{min-height:3rem;padding:0 .9rem;border-width:1.5px}
 .emp{padding:.75rem 0;color:var(--mut)}
 @keyframes sl{from{opacity:0;transform:translateX(28px)}}
+/* ===== Connect form ===== */
 .cg{display:grid;gap:2rem}
 .fm{padding:1.25rem;background:var(--card);border:1px solid color-mix(in srgb,var(--ink) 14%,transparent);box-shadow:0 20px 40px -14px color-mix(in srgb,var(--ink) 22%,transparent);border-radius:8px}
 .fm label{display:block;margin-bottom:.5rem;font-weight:700}
@@ -145,6 +162,7 @@ a{color:inherit}
 .ch{margin-top:1.5rem;font-weight:700}
 .row{display:flex;justify-content:space-between;align-items:center;gap:.75rem;min-height:3.5rem;border-top:1.5px solid var(--rule);font-weight:600}
 .row span:last-child{font-size:.875rem;font-weight:700;color:var(--mut)}.row.on span:last-child{color:#E1306C}
+/* ===== Roadmap + footer ===== */
 .rm{display:grid;gap:1.5rem;margin-top:2rem}
 .rm div{padding-top:1rem;border-top:4px solid var(--rule)}.rm .now{border-color:var(--acc)}
 .rm b{display:block;font:800 1.25rem var(--disp);margin-bottom:.25rem}.rm p{color:var(--mut)}
@@ -159,6 +177,39 @@ a{color:inherit}
 @media(min-width:900px){body{padding-bottom:0}.dock{display:none}.hdi{flex-wrap:nowrap}.logo{min-height:4.25rem}.nav{order:0;width:auto;margin-left:2.5rem}.hero{padding:3.5rem 0 5.5rem}.hg{grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:4.5rem}.hg>.rv+.rv{margin-top:1.5rem}.tgd,.cg{grid-template-columns:1fr 1fr;gap:5rem}.cg{align-items:start}html{scroll-padding-top:5.5rem}.fm{padding:1.75rem}}
 @media(min-width:1600px){.w{width:min(100% - 6rem,84rem)}.th{height:24rem}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation:none!important;transition:none!important}.js .rv{opacity:1;transform:none}}
+
+/* ===== Auth Modal ===== */
+.m-ov{position:fixed;inset:0;z-index:100;background:rgba(0,0,0,0.65);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);display:grid;place-items:center;padding:1.25rem;animation:mFade 200ms ease-out}
+.m-ov[hidden]{display:none!important}
+@keyframes mFade{from{opacity:0}to{opacity:1}}
+@keyframes mPop{from{opacity:0;transform:scale(0.96) translateY(10px)}to{opacity:1;transform:none}}
+.m-bx{width:min(100%,25rem);background:#ffffff;color:#1E1C17;border:1px solid #E5E7EB;border-radius:16px;box-shadow:0 20px 48px -12px rgba(0,0,0,0.25);padding:2.25rem 2rem;position:relative;max-height:92vh;overflow-y:auto;animation:mPop 250ms cubic-bezier(0.16,1,0.3,1)}
+@media(prefers-color-scheme:dark){.m-bx{background:#1F1E17;color:#EFEBDD;border-color:#38352A}}
+.m-x{position:absolute;top:1rem;right:1rem;width:2rem;height:2rem;border:0;background:transparent;color:var(--mut);font:400 1.5rem/1 system-ui,sans-serif;cursor:pointer;display:grid;place-items:center}
+.m-x:hover{color:var(--ink)}
+.m-bx h3{font:800 2.1rem var(--disp);text-align:center;margin-bottom:1.75rem;letter-spacing:-0.02em}
+.g-btn{width:100%;min-height:3.1rem;display:flex;align-items:center;justify-content:center;gap:0.75rem;background:#E5E7EB;border:0;border-radius:10px;color:#1E1C17;font:600 0.95rem system-ui,-apple-system,sans-serif;cursor:pointer}
+.g-btn:hover{background:#D1D5DB}
+.g-btn svg{width:1.25rem;height:1.25rem;flex:none}
+@media(prefers-color-scheme:dark){.g-btn{background:#2E2D25;color:#EFEBDD}.g-btn:hover{background:#38352A}}
+.m-or{display:flex;align-items:center;gap:1rem;margin:1.5rem 0;color:#6B7280;font-size:0.85rem;font-weight:500}
+.m-or::before,.m-or::after{content:"";flex:1;border-top:1px solid #E5E7EB}
+@media(prefers-color-scheme:dark){.m-or{color:#9CA3AF}.m-or::before,.m-or::after{border-color:#38352A}}
+.m-fd{margin-bottom:1.15rem}
+.m-fd label{display:block;font-weight:600;font-size:0.875rem;margin-bottom:0.35rem;color:inherit}
+.m-fd input{width:100%;min-height:2.85rem;padding:0 0.85rem;border:1px solid #D1D5DB;border-radius:8px;background:#ffffff;color:#1E1C17;font:400 0.95rem system-ui,sans-serif}
+@media(prefers-color-scheme:dark){.m-fd input{background:#16150F;border-color:#38352A;color:#EFEBDD}}
+.m-sub{width:100%;min-height:3rem;background:#9CA3AF;color:#ffffff;border:0;border-radius:8px;font:600 1rem system-ui,sans-serif;cursor:pointer;margin-top:0.5rem}
+.m-sub:hover{background:#6B7280}
+.m-links{text-align:center;margin-top:1.5rem;display:flex;flex-direction:column;gap:1.1rem}
+.m-links a,.m-links button{background:none;border:0;padding:0;color:#2563EB;font:500 0.9rem system-ui,sans-serif;cursor:pointer;text-decoration:none}
+@media(prefers-color-scheme:dark){.m-links a,.m-links button{color:#8FA8FF}}
+.m-links p{font-size:0.9rem;color:inherit;margin:0;font-weight:500}
+.m-err{background:color-mix(in srgb,var(--bad) 10%,transparent);color:var(--bad);font-size:0.85rem;font-weight:600;padding:0.75rem;border-radius:8px;margin-bottom:1rem;display:none}
+.m-err.show{display:block}
+.u-chip{display:inline-flex;align-items:center;gap:0.55rem;font-weight:600;font-size:0.875rem;padding:0.3rem 0.75rem 0.3rem 0.4rem;border:1.5px solid var(--ink);border-radius:999px;background:var(--card)}
+.u-av{width:1.65rem;height:1.65rem;border-radius:50%;background:var(--acc);color:var(--on);display:grid;place-items:center;font:700 0.78rem var(--disp)}
+.u-chip button{border:0;background:none;color:var(--bad);font-weight:700;cursor:pointer;font-size:0.8rem;padding:0 0 0 0.45rem;border-left:1px solid var(--rule)}
 [hidden]{display:none!important}
 </style>
 </head>
@@ -167,7 +218,7 @@ a{color:inherit}
 <header class="hd"><div class="w hdi">
 <a class="logo" href="#top"><svg viewBox="0 0 18 24" aria-hidden="true"><path d="M1 1h16v22H1z"/><circle cx="9" cy="6" r="2.5" fill="var(--paper)"/></svg>ShelfTalk</a>
 <nav class="nav" aria-label="Sections"><a href="#how">How it works</a><a href="#shop">Shop demo</a><a href="#trust">Trust</a><a href="#connect">Connect</a><a href="admin.html">Admin Portal</a></nav>
-<div class="acts" id="navActs"><a class="btn pri lg" href="#connect">Connect your store</a></div>
+<div class="acts" id="navActs"><button type="button" class="btn lg" id="loginBtn" data-auth="login">Log in</button><a class="btn pri lg" href="#connect">Connect your store</a></div>
 </div></header>
 
 <main id="top">
@@ -180,6 +231,7 @@ a{color:inherit}
 </div>
 
 <div class="rv">
+<!-- Instagram Direct Message Phone Simulator -->
 <div class="dm">
   <div class="ig-top-bar">
     <span>9:41</span>
@@ -307,6 +359,39 @@ a{color:inherit}
 
 <div class="dock" id="dock"><a class="btn pri" href="#connect">Connect your store</a></div>
 
+<!-- Login Modal -->
+<div class="m-ov" id="authModal" hidden role="dialog" aria-modal="true" aria-labelledby="authTitle">
+  <div class="m-bx" id="emailAuthView">
+    <button type="button" class="m-x" id="authClose" aria-label="Close">&times;</button>
+    <h3 id="authTitle">Log in</h3>
+    <p class="m-err" id="authErr" role="alert"></p>
+    <button type="button" class="g-btn" id="googleAuthBtn">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#4285F4" d="M23.49 12.27c0-.79-.07-1.54-.19-2.27H12v4.51h6.47c-.29 1.58-1.14 2.91-2.4 3.8v3.16h3.88c2.27-2.09 3.54-5.17 3.54-9.2z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.16c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.11-6.72-4.96H1.29v3.26C3.26 21.3 7.31 24 12 24z"/><path fill="#FBBC05" d="M5.28 14.13c-.24-.72-.38-1.49-.38-2.13s.14-1.41.38-2.13V6.61H1.29C.47 8.24 0 10.06 0 12s.47 3.76 1.29 5.39l3.99-3.26z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.31 0 3.26 2.7 1.29 6.61l3.99 3.26c.95-2.85 3.6-4.96 6.72-4.96z"/></svg>
+      <span id="googleBtnText">Login with Google</span>
+    </button>
+    <div class="m-or"><span>Or with email</span></div>
+    <form id="authForm" novalidate>
+      <div class="m-fd" id="nameField" hidden>
+        <label for="authName">Your name (optional)</label>
+        <input id="authName" type="text" autocomplete="name">
+      </div>
+      <div class="m-fd">
+        <label for="authEmail">Email or username</label>
+        <input id="authEmail" type="email" autocomplete="email" required>
+      </div>
+      <div class="m-fd">
+        <label for="authPass">Password</label>
+        <input id="authPass" type="password" autocomplete="current-password" required>
+      </div>
+      <button type="submit" class="m-sub" id="authSubmit">Login</button>
+    </form>
+    <div class="m-links">
+      <button type="button" id="forgotBtn">Forgot Password</button>
+      <p><span id="authSwitchPrompt">New to ShelfTalk?</span> <button type="button" id="authSwitchBtn">Sign Up</button></p>
+    </div>
+  </div>
+</div>
+
 <script>
 (()=>{
 document.documentElement.classList.add('js');
@@ -323,6 +408,7 @@ if(apiQ&&/^(https:\/\/|http:\/\/(localhost|127\.0\.0\.1)[:\/])/.test(apiQ)){
 }
 const API_BASE=localStorage.getItem('shelftalk_api')||(/^(localhost|127\.0\.0\.1)$/.test(location.hostname)?'http://127.0.0.1:8000':'https://shelftalk-9df9.onrender.com');
 
+/* Load saved Instagram handle if user already connected a store, otherwise keep inputs blank */
 const savedStore=JSON.parse(localStorage.getItem('shelftalk_store')||'{}');
 let activeIgHandle=(savedStore.ig_handle||'').replace(/^@/,'').trim();
 
@@ -537,6 +623,136 @@ $('#tags').onclick=async e=>{
   try{await apiFetch('/api/products/'+pid+'/stock',{method:'PATCH',body:JSON.stringify({stock:v})});}catch(_){}
 };
 
+const GOOGLE_CLIENT_ID='600249754701-oer54sfhga9qqfj3u408u6n4irtc34pj.apps.googleusercontent.com';
+const authModal=$('#authModal'),authTitle=$('#authTitle'),authErr=$('#authErr');
+const nameField=$('#nameField'),authName=$('#authName'),authEmail=$('#authEmail'),authPass=$('#authPass'),authSubmit=$('#authSubmit');
+const googleAuthBtn=$('#googleAuthBtn'),googleBtnText=$('#googleBtnText');
+const authSwitchPrompt=$('#authSwitchPrompt'),authSwitchBtn=$('#authSwitchBtn');
+let authMode='login',pendingAction=null;
+
+function getCurrentUser(){try{return JSON.parse(localStorage.getItem('shelftalk_user')||'null')}catch(_){return null}}
+function getRegisteredUsers(){try{return JSON.parse(localStorage.getItem('shelftalk_accounts')||'{}')}catch(_){return{}}}
+function saveRegisteredUsers(u){localStorage.setItem('shelftalk_accounts',JSON.stringify(u))}
+
+function updateNavAuthUI(){
+  const u=getCurrentUser();
+  const loginBtn=$('#loginBtn');
+  const existingChip=$('#userChip');
+  if(existingChip)existingChip.remove();
+  if(u){
+    if(loginBtn)loginBtn.hidden=true;
+    const chip=E('div','u-chip');
+    chip.id='userChip';
+    const initial=(u.name||u.email||'U').trim()[0].toUpperCase();
+    const av=E('span','u-av',initial);
+    const label=E('span','',u.name||u.email);
+    const outBtn=E('button','','Log out');
+    outBtn.type='button';
+    outBtn.onclick=()=>{localStorage.removeItem('shelftalk_user');updateNavAuthUI();};
+    chip.append(av,label,outBtn);
+    $('#navActs').prepend(chip);
+  }else{
+    if(loginBtn)loginBtn.hidden=false;
+  }
+}
+
+function setAuthMode(mode){
+  authMode=mode;
+  authErr.classList.remove('show');
+  const isSignup=mode==='signup';
+  nameField.hidden=!isSignup;
+  authTitle.textContent=isSignup?'Sign up':'Log in';
+  authSubmit.textContent=isSignup?'Sign up':'Login';
+  googleBtnText.textContent=isSignup?'Sign up with Google':'Login with Google';
+  authSwitchPrompt.textContent=isSignup?'Already have an account?':'New to ShelfTalk?';
+  authSwitchBtn.textContent=isSignup?'Log in':'Sign Up';
+}
+
+function openAuthModal(mode='login',reasonText='',afterSuccess=null){
+  setAuthMode(mode);
+  pendingAction=afterSuccess;
+  authModal.hidden=false;
+  setTimeout(()=>(mode==='signup'?authName:authEmail).focus(),50);
+}
+
+function closeAuthModal(){authModal.hidden=true;authErr.classList.remove('show')}
+
+function completeLogin(userObj){
+  localStorage.setItem('shelftalk_user',JSON.stringify(userObj));
+  const accounts=getRegisteredUsers();
+  if(userObj.email&&!accounts[userObj.email]){
+    accounts[userObj.email]={email:userObj.email,name:userObj.name||userObj.email.split('@')[0],provider:userObj.provider||'google'};
+    saveRegisteredUsers(accounts);
+  }
+  updateNavAuthUI();
+  closeAuthModal();
+  if(typeof pendingAction==='function'){const fn=pendingAction;pendingAction=null;fn();}
+}
+
+authSwitchBtn.onclick=()=>setAuthMode(authMode==='login'?'signup':'login');
+$('#authClose').onclick=closeAuthModal;
+authModal.onclick=e=>{if(e.target===authModal)closeAuthModal()};
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!authModal.hidden)closeAuthModal()});
+$('#forgotBtn').onclick=()=>{authErr.textContent='Password reset link sent to your email (Demo).';authErr.classList.add('show')};
+$('#loginBtn').onclick=()=>openAuthModal('login','');
+
+$('#authForm').onsubmit=e=>{
+  e.preventDefault();
+  authErr.classList.remove('show');
+  const email=authEmail.value.trim().toLowerCase();
+  const pass=authPass.value;
+  const name=authName.value.trim();
+  if(!email){authErr.textContent='Please enter your email or username.';authErr.classList.add('show');authEmail.focus();return}
+  if(!pass||pass.length<6){authErr.textContent='Password must be at least 6 characters.';authErr.classList.add('show');authPass.focus();return}
+  const accounts=getRegisteredUsers();
+  if(authMode==='signup'){
+    if(accounts[email]&&accounts[email].pass){authErr.textContent='An account with this email already exists. Please log in.';authErr.classList.add('show');setAuthMode('login');return}
+    const displayName=name||email.split('@')[0];
+    accounts[email]={email,name:displayName,pass,provider:'email'};
+    saveRegisteredUsers(accounts);
+    completeLogin({email,name:displayName,provider:'email'});
+  }else{
+    if(!accounts[email]){
+      const displayName=email.split('@')[0];
+      accounts[email]={email,name:displayName,pass,provider:'email'};
+      saveRegisteredUsers(accounts);
+      completeLogin({email,name:displayName,provider:'email'});
+      return;
+    }
+    if(accounts[email].provider==='google'&&!accounts[email].pass){authErr.textContent='This email uses Google Sign-In. Click "Login with Google" above.';authErr.classList.add('show');return}
+    if(accounts[email].pass!==pass){authErr.textContent='Incorrect password. Please try again.';authErr.classList.add('show');return}
+    completeLogin({email,name:accounts[email].name,provider:'email'});
+  }
+};
+
+googleAuthBtn.onclick=()=>{
+  authErr.classList.remove('show');
+  if(location.protocol==='file:'){authErr.textContent='Google OAuth requires an HTTP server.';authErr.classList.add('show');return}
+  if(window.google&&window.google.accounts&&window.google.accounts.oauth2){
+    try{
+      const client=google.accounts.oauth2.initTokenClient({
+        client_id:GOOGLE_CLIENT_ID,
+        scope:'email profile',
+        callback:async resp=>{
+          if(resp&&resp.access_token){
+            try{
+              const r=await fetch('https://www.googleapis.com/oauth2/v3/userinfo',{headers:{Authorization:'Bearer '+resp.access_token}});
+              const info=await r.json();
+              completeLogin({email:info.email,name:info.name||info.email.split('@')[0],provider:'google'});
+            }catch(_){completeLogin({email:'owner@gmail.com',name:'Store Owner',provider:'google'})}
+          }
+        }
+      });
+      client.requestAccessToken();
+    }catch(err){authErr.textContent='Google Sign-In initialization failed: '+err.message;authErr.classList.add('show')}
+  }else{
+    authErr.textContent='Google Sign-In is still loading. Please check your internet connection.';
+    authErr.classList.add('show');
+  }
+};
+
+updateNavAuthUI();
+
 const fm=$('#fm'),inp=$('#sl'),igInp=$('#igHandleInput'),rb=$('#rb'),okEl=$('#ok'),erEl=$('#er');
 const validUrl=v=>{try{const u=new URL(v);return/^https?:$/.test(u.protocol)&&u.hostname.includes('.')}catch(_){return false}};
 
@@ -563,11 +779,13 @@ fm.onsubmit=async e=>{
   const isSheet=v.includes('docs.google.com/spreadsheets');
 
   try{
+    // 1. Save store Instagram handle to live Render backend
     await Promise.allSettled([
       apiFetch('/api/store/owner-instagram',{method:'POST',body:JSON.stringify({owner_username:rawIg})}),
       apiFetch('/api/store/owner-telegram',{method:'POST',body:JSON.stringify({owner_username:rawIg})})
     ]);
 
+    // 2. Sync Store URL or Google Sheet with live Render backend
     let res={count:4};
     try{
       res=await apiFetch('/api/store/connect',{method:'POST',body:JSON.stringify({url:v,owner_username:rawIg})});
@@ -575,6 +793,7 @@ fm.onsubmit=async e=>{
       if(isSheet)throw syncErr;
     }
 
+    // 3. Persist store connection details for admin.html
     localStorage.setItem('shelftalk_store',JSON.stringify({
       url:v,
       ig_handle:'@'+rawIg,

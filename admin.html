@@ -269,6 +269,7 @@ function applySourceUrlUI(url, sourceType) {
   }
 }
 
+// Initialize blank unless previously saved by the user
 applyHandleUI(currentHandle, true);
 if (currentSourceUrl) {
   storeUrlInput.value = currentSourceUrl;
@@ -317,6 +318,7 @@ async function refreshDashboard() {
       document.getElementById('dotBotpress').classList.add('on');
       document.getElementById('txtBotpress').textContent = h.botpress_connected ? 'Botpress Live' : 'AI Active';
 
+      // Only apply backend handle if user hasn't cleared it or if local handle is empty and backend has a non-default handle
       const backendHandle = (h.owner_username || '').replace(/^@/, '').trim();
       if (!currentHandle && backendHandle && backendHandle !== 'yojityadav') {
         applyHandleUI(backendHandle, true);
@@ -379,6 +381,7 @@ async function refreshDashboard() {
         });
       }
 
+      // Update quick-test chips to match the store's actual synced products
       if (prods.length > 0) {
         const chips = document.getElementById('igChips');
         const firstProd = prods[0].name;
@@ -574,10 +577,11 @@ document.getElementById('syncStoreBtn').addEventListener('click', async () => {
       : `Store URL connected! ${countTxt ? countTxt + ' products' : 'Catalog'} synced live.`;
     await refreshDashboard();
   } catch (err) {
+    // If the user connected a store URL and the backend only had sheet parser deployed, still link the store URL cleanly
     if (!isSheet) {
       applySourceUrlUI(url, 'store_url');
       status.style.color = 'var(--ok)';
-      status.textContent = 'Store URL linked to Admin Portal!';
+      status.textContent = 'Store URL linked to Admin Portal! Deploy updated app/main.py on Render for full store product scraping.';
       await refreshDashboard();
     } else {
       status.style.color = 'var(--bad)';
