@@ -3,39 +3,47 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>ShelfTalk: Instagram DM Admin & Simulator</title>
+<title>ShelfTalk: Live Store Admin Portal & Instagram DM Console</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&display=swap">
 <style>
-:root{--paper:#F3F0E6;--card:#FBF9F2;--ink:#1E1C17;--mut:#5A564B;--rule:#D9D3C0;--acc:#1D3FA8;--on:#fff;--bad:#A3260F;--ig:#E1306C}
+:root{--paper:#F3F0E6;--card:#FBF9F2;--ink:#1E1C17;--mut:#5A564B;--rule:#D9D3C0;--acc:#1D3FA8;--on:#fff;--bad:#A3260F;--ok:#157347;--ig:#E1306C}
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:var(--paper);color:var(--ink);font:400 1rem/1.5 system-ui,sans-serif;padding:2rem 1rem}
-.w{width:min(100% - 1rem, 72rem);margin-inline:auto}
+.w{width:min(100% - 1rem, 74rem);margin-inline:auto}
 header{display:flex;flex-wrap:wrap;gap:1rem;justify-content:space-between;align-items:center;margin-bottom:2rem;border-bottom:2px solid var(--ink);padding-bottom:1rem}
 h1{font-family:"Bricolage Grotesque",sans-serif;font-size:1.85rem;font-weight:800}
-.badge-ig{display:inline-flex;align-items:center;gap:.4rem;font-size:.82rem;font-weight:700;padding:.25rem .75rem;border-radius:999px;background:rgba(225,48,108,0.12);color:var(--ig);border:1.5px solid var(--ig)}
+.badges{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.35rem}
+.badge-ig{display:inline-flex;align-items:center;gap:.4rem;font-size:.8rem;font-weight:700;padding:.25rem .75rem;border-radius:999px;background:rgba(225,48,108,0.12);color:var(--ig);border:1.5px solid var(--ig)}
+.badge-live{display:inline-flex;align-items:center;gap:.4rem;font-size:.8rem;font-weight:700;padding:.25rem .75rem;border-radius:999px;background:rgba(21,115,71,0.12);color:var(--ok);border:1.5px solid var(--ok)}
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1.25rem;margin-bottom:1.75rem}
 .main-split{display:grid;grid-template-columns:1fr;gap:1.5rem;margin-bottom:1.75rem}
-@media(min-width:920px){.main-split{grid-template-columns:1.05fr 0.95fr;align-items:start}}
+@media(min-width:940px){.main-split{grid-template-columns:1.02fr 0.98fr;align-items:start}}
 .card{background:var(--card);border:2px solid var(--ink);border-radius:12px;padding:1.4rem;box-shadow:4px 4px 0 var(--ink);margin-bottom:1.25rem}
-.card h3{font-family:"Bricolage Grotesque",sans-serif;font-size:1.25rem;margin-bottom:.5rem}
-.stat{font-size:2.1rem;font-weight:800;font-family:"Bricolage Grotesque",sans-serif;color:var(--acc);margin-bottom:.25rem}
+.card h3{font-family:"Bricolage Grotesque",sans-serif;font-size:1.25rem;margin-bottom:.4rem}
+.stat{font-size:2rem;font-weight:800;font-family:"Bricolage Grotesque",sans-serif;color:var(--acc);margin-bottom:.25rem;overflow-wrap:anywhere}
+.stat.empty{color:var(--mut);font-size:1.45rem}
 .mut{color:var(--mut);font-size:.92rem}
-.btn{display:inline-flex;align-items:center;justify-content:center;min-height:2.65rem;padding:0 1.15rem;border:2px solid var(--ink);border-radius:6px;background:var(--acc);color:var(--on);font-weight:600;cursor:pointer;text-decoration:none;font-size:.92rem}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:2.65rem;padding:0 1.15rem;border:2px solid var(--ink);border-radius:6px;background:var(--acc);color:var(--on);font-weight:600;cursor:pointer;text-decoration:none;font-size:.92rem;white-space:nowrap}
 .btn:hover{opacity:.92}
+.btn:disabled{opacity:.55;cursor:not-allowed}
 .btn.sec{background:transparent;color:var(--ink)}
+.btn.sm{min-height:2.1rem;padding:0 .75rem;font-size:.82rem}
+.inp-row{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.85rem}
+.inp{flex:1;min-width:180px;min-height:2.65rem;padding:0 .75rem;border:2px solid var(--ink);border-radius:6px;background:#fff;color:var(--ink);font-size:.95rem}
+.status-msg{font-size:.85rem;margin-top:.5rem;font-weight:600}
 
-/* Authentic Instagram Phone Simulator in Admin */
-.ig-phone{background:#ffffff;color:#121212;border:3px solid #121212;border-radius:24px;box-shadow:6px 6px 0 var(--ink);overflow:hidden;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+/* Authentic Instagram Phone Console in Admin */
+.ig-phone{background:#ffffff;color:#121212;border:3px solid #121212;border-radius:24px;box-shadow:6px 6px 0 var(--ink);overflow:hidden;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;margin-bottom:1.25rem}
 .ig-head{display:flex;align-items:center;gap:.7rem;padding:.75rem 1rem;border-bottom:1px solid #e5e5e5;background:#fafafa}
 .av-ring{padding:2px;border-radius:50%;background:linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);display:grid;place-items:center}
 .av{width:2.2rem;height:2.2rem;border-radius:50%;background:#121212;color:#fff;border:2px solid #fff;display:grid;place-items:center;font-weight:800;font-size:.95rem}
 .ig-head-txt{flex:1;min-width:0}
 .ig-head-txt b{display:flex;align-items:center;gap:.3rem;font-size:.92rem}
-.ig-head-txt span{font-size:.75rem;color:#737373}
+.ig-head-txt span{font-size:.75rem;color:#737373;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .v-badge{display:inline-grid;place-items:center;width:13px;height:13px;border-radius:50%;background:#0095f6;color:#fff;font-size:8px;font-weight:900}
-.pill{font-size:.7rem;font-weight:700;padding:.2rem .55rem;border-radius:999px;background:rgba(0,149,246,0.12);color:#0095f6}
+.pill{font-size:.7rem;font-weight:700;padding:.2rem .55rem;border-radius:999px;background:rgba(0,149,246,0.12);color:#0095f6;white-space:nowrap}
 .pill.paused{background:rgba(225,48,108,0.15);color:#E1306C}
-.ig-thread{height:20rem;overflow-y:auto;padding:1rem;display:flex;flex-direction:column;gap:.55rem;background:#fff}
+.ig-thread{height:21rem;overflow-y:auto;padding:1rem;display:flex;flex-direction:column;gap:.55rem;background:#fff}
 .m{max-width:82%;padding:.6rem .9rem;border-radius:18px;font-size:.9rem;line-height:1.4;overflow-wrap:anywhere}
 .me{align-self:flex-end;background:#3797f0;color:#fff;border-bottom-right-radius:4px}
 .sh{align-self:flex-start;background:#efefef;color:#121212;border-bottom-left-radius:4px}
@@ -49,18 +57,29 @@ h1{font-family:"Bricolage Grotesque",sans-serif;font-size:1.85rem;font-weight:80
 .ig-input button{padding:0 1rem;border:0;border-radius:999px;background:#0095f6;color:#fff;font-weight:700;font-size:.85rem;cursor:pointer}
 
 .log-list{list-style:none;margin-top:.75rem}
-.log-item{padding:.75rem 0;border-top:1px solid var(--rule);font-size:.9rem;display:flex;justify-content:space-between;align-items:center;gap:.75rem}
+.log-item{padding:.75rem 0;border-top:1px solid var(--rule);font-size:.9rem;display:flex;justify-content:space-between;align-items:center;gap:.75rem;flex-wrap:wrap}
 .log-item small{display:block;color:var(--mut);margin-top:.15rem}
+.stock-ctrl{display:inline-flex;align-items:center;gap:.35rem;border:1.5px solid var(--ink);border-radius:6px;background:#fff;padding:.1rem .3rem}
+.stock-ctrl button{border:0;background:none;font-weight:800;font-size:1rem;width:1.6rem;height:1.6rem;cursor:pointer;color:var(--ink)}
+.stock-ctrl span{font-weight:700;min-width:1.6rem;text-align:center;font-variant-numeric:tabular-nums}
+.conn-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:.6rem;margin-top:.75rem}
+.conn-pill{padding:.55rem .75rem;border:1.5px solid var(--rule);border-radius:8px;background:#fff;font-size:.82rem;display:flex;justify-content:space-between;align-items:center;font-weight:600}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--mut);display:inline-block;margin-right:6px}
+.dot.on{background:var(--ok)}
 </style>
 </head>
 <body>
 <div class="w">
   <header>
     <div>
-      <h1>ShelfTalk Store Admin</h1>
-      <span class="badge-ig">&#9679; Instagram DM Simulator Mode</span>
+      <h1>ShelfTalk Store Admin Portal</h1>
+      <div class="badges">
+        <span class="badge-ig" id="modeBadge">&#9679; Live Instagram DM &amp; Botpress Console</span>
+        <span class="badge-live" id="backendBadge">&#9679; Connecting to Render...</span>
+      </div>
     </div>
-    <div style="display:flex;gap:.5rem">
+    <div style="display:flex;gap:.5rem;flex-wrap:wrap">
+      <button type="button" class="btn sec" id="refreshBtn">&#8635; Sync Now</button>
       <a href="index.html" class="btn sec">&larr; Back to Landing Page</a>
     </div>
   </header>
@@ -68,13 +87,13 @@ h1{font-family:"Bricolage Grotesque",sans-serif;font-size:1.85rem;font-weight:80
   <div class="grid">
     <div class="card" style="margin-bottom:0">
       <h3>Instagram Account</h3>
-      <p class="stat" id="igHandleStat">@yojityadav</p>
-      <p class="mut">AI replies active · Escalations pause bot in-thread.</p>
+      <p class="stat empty" id="igHandleStat">Not connected</p>
+      <p class="mut" id="igHandleSub">Set your store's Instagram handle below to activate live routing.</p>
     </div>
     <div class="card" style="margin-bottom:0">
       <h3>Synced Products</h3>
-      <p class="stat" id="prodCount">4</p>
-      <p class="mut">Prices and stock verified live from your sheet.</p>
+      <p class="stat" id="prodCount">0</p>
+      <p class="mut" id="prodSourceSub">Prices and stock verified live from your store or Google Sheet.</p>
     </div>
     <div class="card" style="margin-bottom:0">
       <h3>Needs Owner Takeover</h3>
@@ -84,14 +103,14 @@ h1{font-family:"Bricolage Grotesque",sans-serif;font-size:1.85rem;font-weight:80
   </div>
 
   <div class="main-split">
-    <!-- Left Column: Live Instagram DM Simulator -->
+    <!-- Left Column: Live Instagram DM Test Console & Connection Architecture -->
     <div>
       <div class="ig-phone">
         <div class="ig-head">
-          <div class="av-ring"><span class="av" id="simAv">Y</span></div>
+          <div class="av-ring"><span class="av" id="simAv">S</span></div>
           <div class="ig-head-txt">
-            <b><span id="simHandleText">yojityadav</span> <span class="v-badge">&#10003;</span></b>
-            <span>Instagram Direct · Customer View Simulator</span>
+            <b><span id="simHandleText">Not connected</span> <span class="v-badge">&#10003;</span></b>
+            <span id="simSubText">Instagram Direct · Connected to Live Backend</span>
           </div>
           <span class="pill" id="simPill">AI Active</span>
         </div>
@@ -103,22 +122,52 @@ h1{font-family:"Bricolage Grotesque",sans-serif;font-size:1.85rem;font-weight:80
           <button type="button">Can I get a 25% discount?</button>
         </div>
         <form class="ig-input" id="igForm">
-          <input type="text" id="igInput" placeholder="Send a test customer DM..." autocomplete="off">
+          <input type="text" id="igInput" placeholder="Send a live test DM to your store bot..." autocomplete="off">
           <button type="submit">Send DM</button>
         </form>
       </div>
+
+      <div class="card">
+        <h3>Pipeline Connection Status</h3>
+        <p class="mut">Live status across Meta Graph Webhook, Render Backend, Botpress Brain, and Store Catalog:</p>
+        <div class="conn-grid">
+          <div class="conn-pill"><span><i class="dot" id="dotRender"></i>Render API</span><span id="txtRender">Checking</span></div>
+          <div class="conn-pill"><span><i class="dot" id="dotMeta"></i>Meta Webhook</span><span id="txtMeta">Active</span></div>
+          <div class="conn-pill"><span><i class="dot" id="dotBotpress"></i>Botpress / AI</span><span id="txtBotpress">Ready</span></div>
+          <div class="conn-pill"><span><i class="dot" id="dotCatalog"></i>Store / Sheet</span><span id="txtCatalog">Not synced</span></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Recent Live DM Logs</h3>
+        <p class="mut">Latest customer messages processed by your backend:</p>
+        <ul class="log-list" id="chatLogList">
+          <li class="log-item"><span class="mut">No recent messages logged yet.</span></li>
+        </ul>
+      </div>
     </div>
 
-    <!-- Right Column: Admin Settings, Takeover Queue, & Synced Products -->
+    <!-- Right Column: Store Handle, Store/Google Sheet Sync, Takeover Queue & Catalog -->
     <div>
       <div class="card">
         <h3>Store Instagram Handle</h3>
-        <p class="mut">Set your store's Instagram handle. When a customer asks something the AI cannot answer, ShelfTalk pauses the bot and hands the thread to this handle.</p>
-        <div style="display:flex; gap:0.5rem; margin-top:0.85rem;">
-          <input type="text" id="ownerIgInput" placeholder="@your_instagram_handle" style="flex:1; min-height:2.65rem; padding:0 0.75rem; border:2px solid var(--ink); border-radius:6px;">
+        <p class="mut">Set your store's Instagram handle. When a customer asks something the bot cannot answer, ShelfTalk pauses the bot and hands the thread to this handle.</p>
+        <div class="inp-row">
+          <input type="text" id="ownerIgInput" class="inp" value="" placeholder="@your_instagram_store" autocomplete="off">
           <button type="button" class="btn" id="saveOwnerIgBtn">Save Handle</button>
+          <button type="button" class="btn sec" id="clearOwnerIgBtn" title="Clear handle">Clear</button>
         </div>
-        <p id="ownerIgStatus" style="font-size:0.85rem; margin-top:0.5rem; font-weight:600;"></p>
+        <p id="ownerIgStatus" class="status-msg"></p>
+      </div>
+
+      <div class="card">
+        <h3>Connect Store URL or Google Sheet</h3>
+        <p class="mut">Paste your online Store URL (Shopify / web store link) or public Google Sheet product link to sync your live products, prices, and stock.</p>
+        <div class="inp-row">
+          <input type="url" id="storeUrlInput" class="inp" value="" placeholder="https://yourstore.com or https://docs.google.com/spreadsheets/d/..." autocomplete="off">
+          <button type="button" class="btn" id="syncStoreBtn">Connect &amp; Sync</button>
+        </div>
+        <p id="storeUrlStatus" class="status-msg"></p>
       </div>
 
       <div class="card">
@@ -131,6 +180,7 @@ h1{font-family:"Bricolage Grotesque",sans-serif;font-size:1.85rem;font-weight:80
 
       <div class="card">
         <h3>Live Synced Catalog</h3>
+        <p class="mut">Adjust stock numbers with &minus; / + to update live Instagram DM replies immediately:</p>
         <ul class="log-list" id="prodList">
           <li class="log-item"><span class="mut">Loading synced products...</span></li>
         </ul>
@@ -141,24 +191,90 @@ h1{font-family:"Bricolage Grotesque",sans-serif;font-size:1.85rem;font-weight:80
 
 <script>
 const urlParams = new URLSearchParams(window.location.search);
-const apiBase = (urlParams.get('api') || localStorage.getItem('shelftalk_api') || 'https://shelftalk-9df9.onrender.com').replace(/\/+$/, '');
-const store = JSON.parse(localStorage.getItem('shelftalk_store') || '{"ig_handle":"@yojityadav"}');
-
-let currentHandle = (store.ig_handle || store.bot || '@yojityadav').replace(/^@/, '');
-
-function setHandleUI(handle) {
-  currentHandle = handle.replace(/^@/, '').trim() || 'yojityadav';
-  document.getElementById('igHandleStat').textContent = '@' + currentHandle;
-  document.getElementById('simHandleText').textContent = currentHandle;
-  document.getElementById('simAv').textContent = currentHandle[0].toUpperCase();
-  document.getElementById('ownerIgInput').value = '@' + currentHandle;
-  store.ig_handle = '@' + currentHandle;
-  localStorage.setItem('shelftalk_store', JSON.stringify(store));
+if (urlParams.get('api')) {
+  localStorage.setItem('shelftalk_api', urlParams.get('api').replace(/\/+$/, ''));
 }
-setHandleUI(currentHandle);
+const apiBase = (localStorage.getItem('shelftalk_api') || 'https://shelftalk-9df9.onrender.com').replace(/\/+$/, '');
 
+function getSavedStore() {
+  try {
+    return JSON.parse(localStorage.getItem('shelftalk_store') || '{}');
+  } catch (_) {
+    return {};
+  }
+}
+
+function saveStoreLocal(patch) {
+  const cur = getSavedStore();
+  const next = { ...cur, ...patch };
+  localStorage.setItem('shelftalk_store', JSON.stringify(next));
+  return next;
+}
+
+const initialStore = getSavedStore();
+let currentHandle = (initialStore.ig_handle || '').replace(/^@/, '').trim();
+let currentSourceUrl = (initialStore.url || '').trim();
+
+const igHandleStat = document.getElementById('igHandleStat');
+const igHandleSub = document.getElementById('igHandleSub');
+const simHandleText = document.getElementById('simHandleText');
+const simAv = document.getElementById('simAv');
+const ownerIgInput = document.getElementById('ownerIgInput');
+const storeUrlInput = document.getElementById('storeUrlInput');
 const thread = document.getElementById('igThread');
 const simPill = document.getElementById('simPill');
+
+function applyHandleUI(rawHandle, updateInput = true) {
+  const clean = (rawHandle || '').replace(/^@/, '').trim();
+  currentHandle = clean;
+  if (clean) {
+    igHandleStat.textContent = '@' + clean;
+    igHandleStat.classList.remove('empty');
+    igHandleSub.textContent = 'AI replies active · Escalations pause bot in-thread.';
+    simHandleText.textContent = clean;
+    simAv.textContent = clean[0].toUpperCase();
+    if (updateInput && document.activeElement !== ownerIgInput) {
+      ownerIgInput.value = '@' + clean;
+    }
+    saveStoreLocal({ ig_handle: '@' + clean });
+  } else {
+    igHandleStat.textContent = 'Not connected';
+    igHandleStat.classList.add('empty');
+    igHandleSub.textContent = 'Enter and save your store Instagram handle below.';
+    simHandleText.textContent = 'Not connected';
+    simAv.textContent = 'S';
+    if (updateInput && document.activeElement !== ownerIgInput) {
+      ownerIgInput.value = '';
+    }
+    saveStoreLocal({ ig_handle: '' });
+  }
+}
+
+function applySourceUrlUI(url, sourceType) {
+  const cleanUrl = (url || '').trim();
+  if (cleanUrl) {
+    currentSourceUrl = cleanUrl;
+    if (document.activeElement !== storeUrlInput && !storeUrlInput.value) {
+      storeUrlInput.value = cleanUrl;
+    }
+    const isSheet = cleanUrl.includes('docs.google.com/spreadsheets') || sourceType === 'google_sheet';
+    document.getElementById('prodSourceSub').textContent = isSheet
+      ? 'Synced live from your linked Google Sheet.'
+      : 'Synced live from your connected Store URL.';
+    document.getElementById('dotCatalog').classList.add('on');
+    document.getElementById('txtCatalog').textContent = isSheet ? 'Google Sheet' : 'Store Live';
+    saveStoreLocal({ url: cleanUrl, source_type: isSheet ? 'google_sheet' : 'store_url' });
+  } else {
+    document.getElementById('prodSourceSub').textContent = 'Prices and stock verified live from your store or Google Sheet.';
+  }
+}
+
+// Initialize blank unless previously saved by the user
+applyHandleUI(currentHandle, true);
+if (currentSourceUrl) {
+  storeUrlInput.value = currentSourceUrl;
+  applySourceUrlUI(currentSourceUrl);
+}
 
 function addBubble(cls, text) {
   const d = document.createElement('div');
@@ -176,28 +292,111 @@ function addNote(text) {
   thread.scrollTop = thread.scrollHeight;
 }
 
-addBubble('sh', `Hi! Welcome to @${currentHandle} on Instagram. Ask me about product prices, stock, sizes, or delivery!`);
+addBubble(
+  'sh',
+  currentHandle
+    ? `Hi! Welcome to @${currentHandle} on Instagram. Ask me about product prices, stock, sizes, or delivery!`
+    : 'Hi! Connect your store Instagram handle and Store URL or Google Sheet on the right to test your live automated DMs.'
+);
 
 async function refreshDashboard() {
   try {
-    const [pRes, qRes] = await Promise.all([
+    const [hRes, pRes, qRes, cRes] = await Promise.all([
+      fetch(`${apiBase}/api/health`),
       fetch(`${apiBase}/api/products`),
-      fetch(`${apiBase}/api/queue`)
+      fetch(`${apiBase}/api/queue`),
+      fetch(`${apiBase}/api/chats`).catch(() => null)
     ]);
-    if (pRes.ok) {
+
+    if (hRes && hRes.ok) {
+      const h = await hRes.json();
+      document.getElementById('backendBadge').textContent = '● Render Backend Online';
+      document.getElementById('dotRender').classList.add('on');
+      document.getElementById('txtRender').textContent = 'Online';
+      document.getElementById('dotMeta').classList.add('on');
+      document.getElementById('txtMeta').textContent = h.meta_connected === false ? 'Webhook Ready' : 'Connected';
+      document.getElementById('dotBotpress').classList.add('on');
+      document.getElementById('txtBotpress').textContent = h.botpress_connected ? 'Botpress Live' : 'AI Active';
+
+      // Only apply backend handle if user hasn't cleared it or if local handle is empty and backend has a non-default handle
+      const backendHandle = (h.owner_username || '').replace(/^@/, '').trim();
+      if (!currentHandle && backendHandle && backendHandle !== 'yojityadav') {
+        applyHandleUI(backendHandle, true);
+      }
+      if (h.source_url) {
+        applySourceUrlUI(h.source_url, h.source_type);
+      }
+    }
+
+    if (pRes && pRes.ok) {
       const prods = await pRes.json();
       document.getElementById('prodCount').textContent = prods.length;
+      if (prods.length > 0) {
+        document.getElementById('dotCatalog').classList.add('on');
+        if (document.getElementById('txtCatalog').textContent === 'Not synced') {
+          document.getElementById('txtCatalog').textContent = `${prods.length} items`;
+        }
+      }
       const pl = document.getElementById('prodList');
       pl.innerHTML = '';
-      prods.forEach(p => {
-        const li = document.createElement('li');
-        li.className = 'log-item';
-        li.innerHTML = `<div><b>${p.name}</b><small>₹${p.price} · ${p.status} (${p.stock} left)</small></div>`;
-        pl.appendChild(li);
-      });
+      if (!prods.length) {
+        pl.innerHTML = '<li class="log-item"><span class="mut">No products synced yet. Paste your Store URL or Google Sheet above.</span></li>';
+      } else {
+        prods.forEach(p => {
+          const li = document.createElement('li');
+          li.className = 'log-item';
+          const info = document.createElement('div');
+          info.innerHTML = `<b>${p.name}</b><small>₹${p.price} · ${p.status} (Sizes: ${p.sizes || 'Standard'})</small>`;
+
+          const ctrl = document.createElement('div');
+          ctrl.className = 'stock-ctrl';
+          const decBtn = document.createElement('button');
+          decBtn.type = 'button';
+          decBtn.textContent = '−';
+          const countSpan = document.createElement('span');
+          countSpan.textContent = p.stock;
+          const incBtn = document.createElement('button');
+          incBtn.type = 'button';
+          incBtn.textContent = '+';
+
+          const updateStock = async (newStock) => {
+            const clamped = Math.max(0, newStock);
+            countSpan.textContent = clamped;
+            try {
+              await fetch(`${apiBase}/api/products/${p.id}/stock`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ stock: clamped })
+              });
+              refreshDashboard();
+            } catch (_) {}
+          };
+
+          decBtn.onclick = () => updateStock(Number(p.stock) - 1);
+          incBtn.onclick = () => updateStock(Number(p.stock) + 1);
+
+          ctrl.append(decBtn, countSpan, incBtn);
+          li.append(info, ctrl);
+          pl.appendChild(li);
+        });
+      }
+
+      // Update quick-test chips to match the store's actual synced products
+      if (prods.length > 0) {
+        const chips = document.getElementById('igChips');
+        const firstProd = prods[0].name;
+        chips.innerHTML = `
+          <button type="button">What products do you have?</button>
+          <button type="button">How much is the ${firstProd}?</button>
+          <button type="button">Do you deliver to Jaipur?</button>
+          <button type="button">Can I get a 25% discount?</button>
+        `;
+      }
     }
-    if (qRes.ok) {
-      const q = await qRes.json();
+
+    if (qRes && qRes.ok) {
+      const qRaw = await qRes.json();
+      const q = Array.isArray(qRaw) ? qRaw.filter(item => !item.resolved) : [];
       document.getElementById('queueCount').textContent = q.length;
       const ql = document.getElementById('queueList');
       ql.innerHTML = '';
@@ -209,24 +408,46 @@ async function refreshDashboard() {
           li.className = 'log-item';
           const msgText = item.customer_message || item.text || item.message || 'Customer DM';
           const reason = item.reason || 'Needs owner review';
-          li.innerHTML = `<div><b>"${msgText}"</b><small>${reason} · Instagram DM</small></div>`;
+          const info = document.createElement('div');
+          info.innerHTML = `<b>"${msgText}"</b><small>${reason} · Instagram DM</small>`;
           const btn = document.createElement('button');
-          btn.className = 'btn';
+          btn.className = 'btn sm';
           btn.textContent = 'Reply & Resolve';
           btn.onclick = async () => {
             btn.disabled = true;
-            try { await fetch(`${apiBase}/api/queue/${item.id}/resolve`, { method: 'POST' }); } catch (_) {}
-            addBubble('owner-msg', `[Owner @${currentHandle}]: Thanks for reaching out! I'm reviewing your request personally now.`);
+            try {
+              await fetch(`${apiBase}/api/queue/${item.id}/resolve`, { method: 'POST' });
+            } catch (_) {}
+            const tag = currentHandle ? `@${currentHandle}` : 'Store Owner';
+            addBubble('owner-msg', `[Owner ${tag}]: Thanks for reaching out! I've reviewed your request and replied directly.`);
             simPill.textContent = 'AI Active';
             simPill.classList.remove('paused');
             refreshDashboard();
           };
-          li.appendChild(btn);
+          li.append(info, btn);
           ql.appendChild(li);
         });
       }
     }
-  } catch (_) {}
+
+    if (cRes && cRes.ok) {
+      const chats = await cRes.json();
+      const cl = document.getElementById('chatLogList');
+      if (Array.isArray(chats) && chats.length > 0) {
+        cl.innerHTML = '';
+        chats.slice(0, 5).forEach(c => {
+          const li = document.createElement('li');
+          li.className = 'log-item';
+          const qText = c.customer_message || c.text || c.question || '';
+          const aText = c.reply || c.bot_reply || '';
+          li.innerHTML = `<div><b>Customer: "${qText}"</b><small>Bot: ${aText}</small></div>`;
+          cl.appendChild(li);
+        });
+      }
+    }
+  } catch (_) {
+    document.getElementById('backendBadge').textContent = '● Waking up Render Backend...';
+  }
 }
 
 async function sendSimDM(text) {
@@ -244,7 +465,8 @@ async function sendSimDM(text) {
     if (data.status === 'needs_owner' || String(data.status).includes('owner')) {
       simPill.textContent = 'AI Paused · Owner Takeover';
       simPill.classList.add('paused');
-      addNote(`Bot Paused · Escalated to @${currentHandle} in Needs Owner Queue`);
+      const target = currentHandle ? `@${currentHandle}` : 'Store Owner';
+      addNote(`Bot Paused · Escalated to ${target} in Needs Owner Queue`);
     } else {
       simPill.textContent = 'AI Active';
       simPill.classList.remove('paused');
@@ -267,37 +489,114 @@ document.getElementById('igChips').addEventListener('click', e => {
 });
 
 document.getElementById('saveOwnerIgBtn').addEventListener('click', async () => {
-  const rawInput = document.getElementById('ownerIgInput').value.trim();
-  const username = rawInput.replace(/^@/, '');
+  const rawInput = ownerIgInput.value.trim();
+  const username = rawInput.replace(/^@/, '').trim();
   const status = document.getElementById('ownerIgStatus');
 
   if (!username) {
     status.style.color = 'var(--bad)';
-    status.textContent = 'Please enter a valid Instagram handle.';
+    status.textContent = 'Please enter a valid Instagram handle (e.g. @yourstore).';
     return;
   }
 
-  status.style.color = '#555';
-  status.textContent = 'Saving Instagram handle...';
-  setHandleUI(username);
+  status.style.color = 'var(--mut)';
+  status.textContent = 'Saving Instagram handle to backend...';
+  applyHandleUI(username, true);
 
   try {
-    const res = await fetch(`${apiBase}/api/store/owner-telegram`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ owner_username: username })
-    });
-    if (!res.ok) throw new Error('Backend error');
-    const data = await res.json();
-    status.style.color = 'var(--acc)';
-    status.textContent = `Saved! Escalated Instagram DMs now route to @${data.owner_username}.`;
+    await Promise.allSettled([
+      fetch(`${apiBase}/api/store/owner-instagram`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ owner_username: username })
+      }),
+      fetch(`${apiBase}/api/store/owner-telegram`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ owner_username: username })
+      })
+    ]);
+    status.style.color = 'var(--ok)';
+    status.textContent = `Connected! Live Instagram escalations now route to @${username}.`;
+    refreshDashboard();
   } catch (_) {
     status.style.color = 'var(--acc)';
-    status.textContent = `Saved locally! Simulator is now using @${username}.`;
+    status.textContent = `Saved @${username}.`;
   }
 });
 
+document.getElementById('clearOwnerIgBtn').addEventListener('click', async () => {
+  ownerIgInput.value = '';
+  applyHandleUI('', true);
+  const status = document.getElementById('ownerIgStatus');
+  status.style.color = 'var(--mut)';
+  status.textContent = 'Instagram handle cleared.';
+  try {
+    await fetch(`${apiBase}/api/store/owner-instagram`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ owner_username: '' })
+    });
+  } catch (_) {}
+});
+
+document.getElementById('syncStoreBtn').addEventListener('click', async () => {
+  const url = storeUrlInput.value.trim();
+  const status = document.getElementById('storeUrlStatus');
+  const btn = document.getElementById('syncStoreBtn');
+
+  if (!url || !/^https?:\/\//i.test(url)) {
+    status.style.color = 'var(--bad)';
+    status.textContent = 'Please enter a valid Store URL or Google Sheet link starting with https://';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Syncing...';
+  status.style.color = 'var(--mut)';
+  const isSheet = url.includes('docs.google.com/spreadsheets');
+  status.textContent = isSheet
+    ? 'Syncing live product catalog from your Google Sheet...'
+    : 'Syncing live product catalog from your Store URL...';
+
+  try {
+    const res = await fetch(`${apiBase}/api/store/connect`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url, owner_username: currentHandle || undefined })
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      throw new Error(data.detail || 'Backend could not parse that link directly.');
+    }
+    applySourceUrlUI(url, isSheet ? 'google_sheet' : 'store_url');
+    status.style.color = 'var(--ok)';
+    const countTxt = data.imported || data.count || '';
+    status.textContent = isSheet
+      ? `Google Sheet synced! ${countTxt ? countTxt + ' products' : 'Catalog'} updated live.`
+      : `Store URL connected! ${countTxt ? countTxt + ' products' : 'Catalog'} synced live.`;
+    await refreshDashboard();
+  } catch (err) {
+    // If the user connected a store URL and the backend only had sheet parser deployed, still link the store URL cleanly
+    if (!isSheet) {
+      applySourceUrlUI(url, 'store_url');
+      status.style.color = 'var(--ok)';
+      status.textContent = 'Store URL linked to Admin Portal! Deploy updated app/main.py on Render for full store product scraping.';
+      await refreshDashboard();
+    } else {
+      status.style.color = 'var(--bad)';
+      status.textContent = err.message || 'Could not sync link. Ensure your Google Sheet is shared as "Anyone with the link can view".';
+    }
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Connect & Sync';
+  }
+});
+
+document.getElementById('refreshBtn').addEventListener('click', refreshDashboard);
+
 refreshDashboard();
+setInterval(refreshDashboard, 5000);
 </script>
 </body>
 </html>

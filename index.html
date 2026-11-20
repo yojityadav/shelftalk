@@ -7,11 +7,11 @@
 <meta name="theme-color" content="#16150F" media="(prefers-color-scheme:dark)">
 <meta name="color-scheme" content="light dark">
 <title>ShelfTalk: Instagram DM Automation for Online Stores</title>
-<meta name="description" content="ShelfTalk answers customer Instagram DMs about price, stock, size and delivery using only your real store data, and hands off to you when unsure.">
+<meta name="description" content="ShelfTalk answers customer Instagram DMs about price, stock, size and delivery using only your real store or Google Sheet data, and hands off to you when unsure.">
 <link rel="canonical" href="https://shelftalk-sandy.vercel.app/">
 <meta property="og:type" content="website">
 <meta property="og:title" content="ShelfTalk: Instagram DM AI for small online stores">
-<meta property="og:description" content="Answers customer Instagram DMs from your own product sheet and policy. If it is not sure, it hands the chat to you.">
+<meta property="og:description" content="Answers customer Instagram DMs from your own online store or Google Sheet and policy. If it is not sure, it hands the chat to you.">
 <meta property="og:url" content="https://shelftalk-sandy.vercel.app/">
 <meta name="twitter:card" content="summary">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M6 3h20v26H6z' fill='%231D3FA8'/%3E%3Ccircle cx='16' cy='9' r='3' fill='%23F3F0E6'/%3E%3C/svg%3E">
@@ -217,17 +217,17 @@ a{color:inherit}
 
 <header class="hd"><div class="w hdi">
 <a class="logo" href="#top"><svg viewBox="0 0 18 24" aria-hidden="true"><path d="M1 1h16v22H1z"/><circle cx="9" cy="6" r="2.5" fill="var(--paper)"/></svg>ShelfTalk</a>
-<nav class="nav" aria-label="Sections"><a href="#how">How it works</a><a href="#shop">Shop demo</a><a href="#trust">Trust</a><a href="#connect">Connect</a></nav>
-<div class="acts" id="navActs"><button type="button" class="btn lg" id="loginBtn" data-auth="login">Log in</button><a class="btn pri lg" href="#connect" data-gate="connect">Connect your store</a></div>
+<nav class="nav" aria-label="Sections"><a href="#how">How it works</a><a href="#shop">Shop demo</a><a href="#trust">Trust</a><a href="#connect">Connect</a><a href="admin.html">Admin Portal</a></nav>
+<div class="acts" id="navActs"><button type="button" class="btn lg" id="loginBtn" data-auth="login">Log in</button><a class="btn pri lg" href="#connect">Connect your store</a></div>
 </div></header>
 
 <main id="top">
 <section class="hero"><div class="w hg">
 <div class="rv">
-<p class="live"><i></i>Interactive Instagram DM Simulator</p>
+<p class="live"><i></i>Live Instagram DM Automation &amp; Admin Portal</p>
 <h1>Answer every Instagram DM about price and stock, even when you are busy.</h1>
-<p class="lead">ShelfTalk replies inside your store's Instagram DMs using your real Google Sheet and policy. When a customer asks to negotiate or complains, it pauses and hands the chat to you.</p>
-<div class="cta"><a class="btn pri" href="#connect" data-gate="connect">Connect your store</a><a class="btn" href="admin.html">Open Admin & Simulator</a></div>
+<p class="lead">ShelfTalk replies inside your store's Instagram DMs using your real Store URL or Google Sheet and policy. When a customer asks to negotiate or complains, it pauses and hands the chat to you.</p>
+<div class="cta"><a class="btn pri" href="#connect">Connect your store</a><a class="btn" href="admin.html">Open Live Admin Portal</a></div>
 </div>
 
 <div class="rv">
@@ -240,9 +240,9 @@ a{color:inherit}
   </div>
   <div class="dh">
     <span class="ig-back" aria-hidden="true">&#8249;</span>
-    <div class="av-ring"><span class="av" id="simAvatar" aria-hidden="true">L</span></div>
+    <div class="av-ring"><span class="av" id="simAvatar" aria-hidden="true">S</span></div>
     <div class="dh-info">
-      <b><span id="simHandle">lumen_jewellery</span> <span class="ig-badge">&#10003;</span></b>
+      <b><span id="simHandle">your_store</span> <span class="ig-badge">&#10003;</span></b>
       <span>Active now · Automated by ShelfTalk</span>
     </div>
     <span class="ig-mode-pill" id="igModePill">AI Auto-Reply</span>
@@ -257,12 +257,12 @@ a{color:inherit}
   </div>
   <form class="snd" id="sf">
     <div class="snd-box">
-      <input id="si" type="text" placeholder="Message @lumen_jewellery..." aria-label="Message" autocomplete="off">
+      <input id="si" type="text" placeholder="Message store..." aria-label="Message" autocomplete="off">
       <button type="submit">Send</button>
     </div>
   </form>
 </div>
-<p class="dnote">Live Instagram DM Simulator · Powered by your store's Google Sheet &amp; FastAPI backend.</p>
+<p class="dnote">Live Instagram DM Console · Powered by your Store URL or Google Sheet &amp; FastAPI backend.</p>
 <div class="fig">
 <div>Live stock<b id="fs">12</b>Silver Hoops</div>
 <div>Needs owner<b class="cnt">3</b>DMs waiting</div>
@@ -278,18 +278,18 @@ a{color:inherit}
 
 <section id="how" class="sec"><div class="w rv">
 <h2>Four checks before any DM reply goes out</h2>
-<p class="sub">No complex flows to build. Paste your Google Sheet product catalog, and ShelfTalk handles your Instagram inbox.</p>
+<p class="sub">No complex flows to build. Paste your online Store URL or Google Sheet product catalog, and ShelfTalk handles your Instagram inbox.</p>
 <ol class="chk">
 <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12l5 5L20 6"/></svg><h3>Reads the Instagram DM</h3><p>Understands free-text customer messages, typos and shorthand included.</p></li>
-<li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12l5 5L20 6"/></svg><h3>Checks your live sheet</h3><p>Looks up products, live stock and store policy. Never hallucinates from memory.</p></li>
-<li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12l5 5L20 6"/></svg><h3>Sends the DM reply</h3><p>A friendly response built strictly from the numbers found in your sheet.</p></li>
+<li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12l5 5L20 6"/></svg><h3>Checks your live store or sheet</h3><p>Looks up products, live stock and store policy. Never hallucinates from memory.</p></li>
+<li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12l5 5L20 6"/></svg><h3>Sends the DM reply</h3><p>A friendly response built strictly from the numbers found in your catalog.</p></li>
 <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12l5 5L20 6"/></svg><h3>Pauses for human takeover</h3><p>Discounts, refunds, and custom orders pause the bot and notify the store owner.</p></li>
 </ol>
 </div></section>
 
 <section id="shop" class="sec alt"><div class="w rv">
-<h2>Your products, answered straight from your sheet</h2>
-<p class="sub">Change a stock number below and test the Instagram DM simulator above—the very next reply updates automatically.</p>
+<h2>Your products, answered straight from your store or sheet</h2>
+<p class="sub">Change a stock number below and test the Instagram DM console above—the very next reply updates automatically.</p>
 <div class="shelf"><ul class="tags" id="tags">
 <li class="tg"><svg viewBox="0 0 120 100" role="img" aria-label="Silver Hoop Earrings"><circle cx="46" cy="50" r="24" fill="none" stroke="var(--ink)" stroke-width="9"/><circle cx="76" cy="50" r="24" fill="none" stroke="var(--acc)" stroke-width="9"/></svg><h3>Silver Hoop Earrings</h3><p class="pr"><b>₹799</b><span class="s">In stock</span></p><div class="stk"><button aria-label="Decrease stock" data-d="-1">−</button><output>12</output><button aria-label="Increase stock" data-d="1">+</button></div><button class="btn" data-q="How much are the silver hoops?">Ask on IG DM</button></li>
 <li class="tg"><svg viewBox="0 0 120 100" role="img" aria-label="Linen Kurta"><path d="M34 22l20-8q6 8 12 0l20 8 12 16-14 8-4-6v40H40V40l-4 6-14-8z" fill="var(--acc)"/></svg><h3>Linen Kurta</h3><p class="pr"><b>₹1,299</b><span class="s low">Only 2 left</span></p><div class="stk"><button aria-label="Decrease stock" data-d="-1">−</button><output>2</output><button aria-label="Increase stock" data-d="1">+</button></div><button class="btn" data-q="Is the linen kurta available?">Ask on IG DM</button></li>
@@ -305,7 +305,7 @@ a{color:inherit}
 <div class="pts">
 <p><strong>Live stock sync.</strong> Set a product to zero and the very next Instagram DM reply reflects it.</p>
 <p><strong>In-thread human takeover.</strong> Complaints, refunds and custom orders pause the AI and flag the owner inside the inbox.</p>
-<p><strong>Zero hallucinated prices.</strong> Every number is verified against your sheet before the reply is sent.</p>
+<p><strong>Zero hallucinated prices.</strong> Every number is verified against your store or Google Sheet before the reply is sent.</p>
 </div>
 </div>
 <div class="qd">
@@ -321,43 +321,43 @@ a{color:inherit}
 
 <section id="connect" class="sec"><div class="w cg rv">
 <div>
-<h2>Connect your store &amp; test your Instagram simulator</h2>
-<p class="sub">Enter your Instagram store handle and paste your public Google Sheet link to launch your custom Instagram DM simulator and admin dashboard.</p>
+<h2>Connect your store &amp; launch your live Admin Portal</h2>
+<p class="sub">Enter your Instagram store handle and paste your online Store URL or public Google Sheet link to sync your live products and open your working Admin Portal.</p>
 </div>
 <form class="fm" id="fm" data-s="idle" novalidate>
 <label for="igHandleInput">Your Instagram store handle</label>
-<input id="igHandleInput" type="text" placeholder="@your_instagram_store" value="@yojityadav" autocomplete="off">
+<input id="igHandleInput" type="text" placeholder="@your_instagram_store" value="" autocomplete="off">
 
-<label for="sl">Google Sheet product link</label>
-<input id="sl" type="url" inputmode="url" placeholder="https://docs.google.com/spreadsheets/d/..." autocomplete="off" aria-describedby="hn er">
-<p class="hint" id="hn">Paste your Google Sheet link so ShelfTalk can sync your real products, prices, and stock.</p>
-<p class="err" id="er" role="alert">Please paste a valid link starting with https://</p>
-<button class="btn pri" type="submit" id="rb">Sync Store &amp; Launch IG Simulator</button>
-<div class="ld" aria-hidden="true"><p class="mut">Syncing your sheet and configuring Instagram DM simulator:</p><div class="sk" style="width:85%"></div><div class="sk" style="width:65%"></div><div class="sk" style="width:75%"></div></div>
-<p class="okm" role="status" id="ok">Store synced! Opening your Instagram Admin Panel &amp; Simulator...</p>
+<label for="sl">Store URL or Google Sheet product link</label>
+<input id="sl" type="url" inputmode="url" placeholder="https://yourstore.com or https://docs.google.com/spreadsheets/d/..." value="" autocomplete="off" aria-describedby="hn er">
+<p class="hint" id="hn">Paste your online Store URL (Shopify / web store) or Google Sheet link so ShelfTalk can sync your real products, prices, and stock.</p>
+<p class="err" id="er" role="alert">Please enter your Instagram handle and a valid Store or Google Sheet link starting with https://</p>
+<button class="btn pri" type="submit" id="rb">Connect Store &amp; Open Admin Portal</button>
+<div class="ld" aria-hidden="true"><p class="mut">Connecting your Instagram handle and syncing your store catalog with Render:</p><div class="sk" style="width:85%"></div><div class="sk" style="width:65%"></div><div class="sk" style="width:75%"></div></div>
+<p class="okm" role="status" id="ok">Store connected! Redirecting to your live Instagram Admin Portal...</p>
 <p class="ch">Active Channel</p>
-<div class="row on"><span>Instagram Business DMs</span><span>Live Simulator Ready</span></div>
-<div class="row"><span>Meta Graph API Webhook</span><span>Pending Meta App Review</span></div>
+<div class="row on"><span>Instagram Business DMs</span><span>Live Webhook Active</span></div>
+<div class="row on"><span>Meta + Botpress + Render</span><span>Connected &amp; Live</span></div>
 </form>
 </div></section>
 
 <section class="sec alt"><div class="w rv">
 <h2>Where we are headed</h2>
 <div class="rm">
-<div class="now"><b>Now</b><p>Interactive Instagram DM Simulator synced live with your Google Sheet and owner handoff queue.</p></div>
-<div><b>Next</b><p>Direct Meta Graph API webhook integration once Meta Business verification completes.</p></div>
-<div><b>Later</b><p>Multi-store management, automated order links, and Shopify/WooCommerce catalog sync.</p></div>
+<div class="now"><b>Now</b><p>Live Meta Instagram DM Webhook synced with your Store URL or Google Sheet, Botpress AI, and Owner Admin Portal.</p></div>
+<div><b>Next</b><p>Automated in-chat checkout links and instant payment confirmation inside Instagram DMs.</p></div>
+<div><b>Later</b><p>Multi-store team inboxes, voice-note DM understanding, and automated restock alerts.</p></div>
 </div>
 </div></section>
 </main>
 
 <footer class="ft"><div class="w">
 <h2>Try it on your store</h2>
-<a class="btn pri" href="#connect" data-gate="early">Connect your store</a>
+<a class="btn pri" href="#connect">Connect your store</a>
 <small>ShelfTalk · AI Instagram DM Assistant for Online Stores.</small>
 </div></footer>
 
-<div class="dock" id="dock"><a class="btn pri" href="#connect" data-gate="connect">Connect your store</a></div>
+<div class="dock" id="dock"><a class="btn pri" href="#connect">Connect your store</a></div>
 
 <!-- Login Modal -->
 <div class="m-ov" id="authModal" hidden role="dialog" aria-modal="true" aria-labelledby="authTitle">
@@ -408,15 +408,18 @@ if(apiQ&&/^(https:\/\/|http:\/\/(localhost|127\.0\.0\.1)[:\/])/.test(apiQ)){
 }
 const API_BASE=localStorage.getItem('shelftalk_api')||(/^(localhost|127\.0\.0\.1)$/.test(location.hostname)?'http://127.0.0.1:8000':'https://shelftalk-9df9.onrender.com');
 
-/* Load saved Instagram handle if available */
+/* Load saved Instagram handle if user already connected a store, otherwise keep inputs blank */
 const savedStore=JSON.parse(localStorage.getItem('shelftalk_store')||'{}');
-let activeIgHandle=(savedStore.ig_handle||'lumen_jewellery').replace(/^@/,'');
+let activeIgHandle=(savedStore.ig_handle||'').replace(/^@/,'').trim();
+
 function updateSimHeader(handle){
-  activeIgHandle=handle.replace(/^@/,'').trim()||'lumen_jewellery';
+  const clean=(handle||'').replace(/^@/,'').trim();
+  activeIgHandle=clean;
+  const disp=clean||'your_store';
   const hEl=$('#simHandle'),avEl=$('#simAvatar'),inpEl=$('#si');
-  if(hEl)hEl.textContent=activeIgHandle;
-  if(avEl)avEl.textContent=activeIgHandle[0].toUpperCase();
-  if(inpEl)inpEl.placeholder='Message @'+activeIgHandle+'...';
+  if(hEl)hEl.textContent=disp;
+  if(avEl)avEl.textContent=disp[0].toUpperCase();
+  if(inpEl)inpEl.placeholder='Message @'+disp+'...';
 }
 updateSimHeader(activeIgHandle);
 
@@ -446,21 +449,22 @@ async function apiFetch(path,opts={}){
 
 function fallbackReply(t){
   const q=t.toLowerCase();
+  const targetHandle=activeIgHandle?('@'+activeIgHandle):'the store owner';
   if(/human|person|owner|refund|complain|damag|wrong|discount|% ?off|negotiat|custom/.test(q))
-    return{h:1,r:'I have paused automated replies and notified @'+activeIgHandle+' to reply to your DM directly.',w:'Needs owner takeover'};
+    return{h:1,r:'I have paused automated replies and notified '+targetHandle+' to reply to your DM directly.',w:'Needs owner takeover'};
   const pr=P.find(x=>x.a.some(a=>q.includes(a))||q.includes(x.n.toLowerCase()));
   if(/deliver|shipping|ship/.test(q)){
     const c=CITIES.find(c=>q.includes(c));
     if(c)return{r:'Yes! We deliver to '+c[0].toUpperCase()+c.slice(1)+' in 2 to 4 days.'};
-    return{h:1,r:'I have flagged @'+activeIgHandle+' to check delivery availability for your city.',w:'City not in delivery list'};
+    return{h:1,r:'I have flagged '+targetHandle+' to check delivery availability for your city.',w:'City not in delivery list'};
   }
   if(/return|exchange/.test(q))return{r:'Unused items can be returned within 7 days of delivery.'};
   if(pr){
-    if(pr.s>0&&pr.s<=2)return{h:1,r:'Only '+pr.s+' left! I have notified @'+activeIgHandle+' to confirm & hold one for you.',w:'Low stock: '+pr.n};
+    if(pr.s>0&&pr.s<=2)return{h:1,r:'Only '+pr.s+' left! I have notified '+targetHandle+' to confirm & hold one for you.',w:'Low stock: '+pr.n};
     if(!pr.s)return{r:pr.n+' is currently sold out.'};
     return{r:pr.n+': '+(/stock|available|have/.test(q)?'In stock ('+pr.s+' available).':fmt(pr.p)+', in stock.')};
   }
-  return{h:1,r:'Passing this DM to @'+activeIgHandle+' so they can help you personally.',w:'Unmatched inquiry'};
+  return{h:1,r:'Passing this DM to '+targetHandle+' so they can help you personally.',w:'Unmatched inquiry'};
 }
 
 function renderProducts(){
@@ -518,14 +522,15 @@ async function syncFromBackend(){
       renderProducts();
     }
     apiOnline=true;
-    if(dnote)dnote.textContent='Instagram DM Simulator · Connected to live FastAPI backend ('+API_BASE+').';
+    if(dnote)dnote.textContent='Live Instagram DM Console · Connected to FastAPI backend ('+API_BASE+').';
   }catch(_){
     apiOnline=false;
   }
   if(!apiOnline)return;
   try{
     const qData=await apiFetch('/api/queue');
-    const qList=Array.isArray(qData)?qData:(qData.queue||qData.items||qData.needs_owner||[]);
+    const qListRaw=Array.isArray(qData)?qData:(qData.queue||qData.items||qData.needs_owner||[]);
+    const qList=qListRaw.filter(item=>!item.resolved);
     const ql=$('#ql');
     ql.innerHTML='';
     qList.forEach(item=>ql.append(renderQueueItem(item)));
@@ -542,6 +547,7 @@ let busy=true;
 async function ask(t){
   t=t.trim();if(!t||busy)return;busy=true;say('me',t);
   const d=E('div','m sh ty');d.setAttribute('role','status');d.setAttribute('aria-label','Typing');d.innerHTML='<i></i><i></i><i></i>';th.append(d);scrollEnd();
+  const targetHandle=activeIgHandle?('@'+activeIgHandle):'the store owner';
   try{
     const data=await apiFetch('/api/chat',{method:'POST',body:JSON.stringify({text:t,source:'instagram_simulator'})});
     d.remove();
@@ -552,7 +558,7 @@ async function ask(t){
     say('sh',replyText);
     if(isHandoff){
       if(modePill){modePill.textContent='Paused · Owner Notified';modePill.classList.add('paused')}
-      th.append(E('p','note','AI Paused · Handed off to @'+activeIgHandle+' in Instagram Inbox'));
+      th.append(E('p','note','AI Paused · Handed off to '+targetHandle+' in Instagram Inbox'));
       await syncFromBackend();
       if(!$$('#ql .qr').some(el=>el.firstChild&&el.firstChild.childNodes[0]?.nodeValue===t)){
         addQ(t,reason,data.queue_id||data.id);
@@ -566,7 +572,7 @@ async function ask(t){
     say('sh',r.r);
     if(r.h){
       if(modePill){modePill.textContent='Paused · Owner Notified';modePill.classList.add('paused')}
-      th.append(E('p','note','AI Paused · Handed off to @'+activeIgHandle+' in Instagram Inbox'));
+      th.append(E('p','note','AI Paused · Handed off to '+targetHandle+' in Instagram Inbox'));
       addQ(t,r.w);
     }else{
       if(modePill){modePill.textContent='AI Auto-Reply';modePill.classList.remove('paused')}
@@ -577,11 +583,12 @@ async function ask(t){
 }
 
 async function play(){
+  const targetHandle=activeIgHandle?('@'+activeIgHandle):'the store owner';
   const s=[
     ['me','How much are the silver hoops?'],
     ['sh','The Silver Hoop Earrings are ₹799 and in stock.'],
     ['me','Can I get 20% off if I buy five?'],
-    ['sh','I have paused automated replies and notified @'+activeIgHandle+' to reply directly.','AI Paused · Handed off to @'+activeIgHandle]
+    ['sh','I have paused automated replies and notified '+targetHandle+' to reply directly.','AI Paused · Handed off to '+targetHandle]
   ];
   for(const[c,t,nt]of s){if(c==='sh')await typing();else await sleep(500);say(c,t);if(nt)th.append(E('p','note',nt))}
   busy=false;
@@ -689,18 +696,6 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!authModal.hidden)c
 $('#forgotBtn').onclick=()=>{authErr.textContent='Password reset link sent to your email (Demo).';authErr.classList.add('show')};
 $('#loginBtn').onclick=()=>openAuthModal('login','');
 
-$$('[data-gate]').forEach(btn=>{
-  btn.addEventListener('click',e=>{
-    if(!getCurrentUser()){
-      e.preventDefault();
-      openAuthModal('login','',()=>{
-        $('#connect').scrollIntoView({behavior:RM?'auto':'smooth'});
-        setTimeout(()=>$('#sl').focus(),350);
-      });
-    }
-  });
-});
-
 $('#authForm').onsubmit=e=>{
   e.preventDefault();
   authErr.classList.remove('show');
@@ -759,50 +754,68 @@ googleAuthBtn.onclick=()=>{
 updateNavAuthUI();
 
 const fm=$('#fm'),inp=$('#sl'),igInp=$('#igHandleInput'),rb=$('#rb'),okEl=$('#ok'),erEl=$('#er');
-const valid=v=>{try{const u=new URL(v);return/^https?:$/.test(u.protocol)&&u.hostname.includes('.')}catch(_){return false}};
+const validUrl=v=>{try{const u=new URL(v);return/^https?:$/.test(u.protocol)&&u.hostname.includes('.')}catch(_){return false}};
 
 fm.onsubmit=async e=>{
   e.preventDefault();
-  if(!getCurrentUser()){
-    openAuthModal('login','Log in to connect your store.',()=>fm.requestSubmit());
-    return;
-  }
   const v=inp.value.trim();
-  const rawIg=(igInp.value.trim()||'yojityadav').replace(/^@/,'');
-  if(!valid(v)){
-    erEl.textContent='That does not look like a valid link. Paste the full address starting with https://';
+  const rawIg=igInp.value.trim().replace(/^@/,'').trim();
+
+  if(!rawIg){
+    erEl.textContent='Please enter your Instagram store handle (for example, @yourstore).';
+    fm.dataset.s='error';igInp.setAttribute('aria-invalid','true');igInp.focus();return;
+  }
+  igInp.removeAttribute('aria-invalid');
+
+  if(!validUrl(v)){
+    erEl.textContent='Please paste a valid Store URL or Google Sheet link starting with https://';
     fm.dataset.s='error';inp.setAttribute('aria-invalid','true');inp.focus();return;
   }
-  inp.removeAttribute('aria-invalid');fm.dataset.s='load';rb.disabled=true;rb.textContent='Syncing Sheet & Instagram Handle…';
-  
+  inp.removeAttribute('aria-invalid');
+
+  fm.dataset.s='load';
+  rb.disabled=true;
+  rb.textContent='Connecting Store & Syncing Catalog…';
+  const isSheet=v.includes('docs.google.com/spreadsheets');
+
   try{
-    let res;
+    // 1. Save store Instagram handle to live Render backend
+    await Promise.allSettled([
+      apiFetch('/api/store/owner-instagram',{method:'POST',body:JSON.stringify({owner_username:rawIg})}),
+      apiFetch('/api/store/owner-telegram',{method:'POST',body:JSON.stringify({owner_username:rawIg})})
+    ]);
+
+    // 2. Sync Store URL or Google Sheet with live Render backend
+    let res={count:4};
     try{
-      await apiFetch('/api/store/owner-telegram',{method:'POST',body:JSON.stringify({owner_username:rawIg})});
-      res=await apiFetch('/api/store/connect',{method:'POST',body:JSON.stringify({url:v})});
-    }catch(_){
-      res={count:4,message:'Connected successfully!'};
+      res=await apiFetch('/api/store/connect',{method:'POST',body:JSON.stringify({url:v,owner_username:rawIg})});
+    }catch(syncErr){
+      if(isSheet)throw syncErr;
     }
-    
+
+    // 3. Persist store connection details for admin.html
     localStorage.setItem('shelftalk_store',JSON.stringify({
       url:v,
       ig_handle:'@'+rawIg,
-      productsCount:res.count||res.imported||4
+      source_type:isSheet?'google_sheet':'store_url',
+      productsCount:res.imported||res.count||4
     }));
     updateSimHeader(rawIg);
 
     fm.dataset.s='ok';
-    okEl.textContent='Connected! Redirecting to your Instagram Admin Panel & Simulator…';
-    await sleep(700);
+    okEl.textContent='Connected! Opening your live Admin Portal…';
+    await sleep(500);
     window.location.href=`admin.html?api=${encodeURIComponent(API_BASE)}`;
   }catch(err){
-    erEl.textContent=err.message||'Could not connect store. Make sure the Google Sheet is shared publicly.';
+    erEl.textContent=err.message||'Could not sync link. Make sure your Store URL or Google Sheet is publicly accessible.';
     fm.dataset.s='error';
   }finally{
-    rb.disabled=false;rb.textContent='Sync Store & Launch IG Simulator';
+    rb.disabled=false;
+    rb.textContent='Connect Store & Open Admin Portal';
   }
 };
 inp.oninput=()=>{if(fm.dataset.s==='error')fm.dataset.s='idle'};
+igInp.oninput=()=>{if(fm.dataset.s==='error')fm.dataset.s='idle'};
 
 const io=new IntersectionObserver(es=>es.forEach(x=>{if(x.isIntersecting){x.target.classList.add('in');io.unobserve(x.target)}}),{threshold:.12});
 $$('.rv').forEach(e=>io.observe(e));
